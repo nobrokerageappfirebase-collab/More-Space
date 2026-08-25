@@ -1,1 +1,438 @@
+<!DOCTYPE html>
+<html lang="te" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>CloudVault - PWA Cloud Storage</title>
+  
+  <!-- Tailwind CSS & Lucide Icons CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
 
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            vaultDark: '#09090b',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Smooth Native App Feel */
+    body {
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    .pb-safe {
+      padding-bottom: env(safe-area-inset-bottom, 1.25rem);
+    }
+  </style>
+</head>
+<body class="bg-neutral-900 text-neutral-100 min-h-screen pb-24 font-sans antialiased">
+
+  <!-- ================= 1. TOP STICKY APP BAR ================= -->
+  <header class="sticky top-0 z-30 flex items-center justify-between px-4 py-3 bg-neutral-900/80 backdrop-blur-md border-b border-neutral-800">
+    <div class="flex items-center space-x-2">
+      <div class="w-8 h-8 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-md shadow-blue-500/20">
+        <i data-lucide="cloud" class="w-5 h-5"></i>
+      </div>
+      <span class="font-bold text-lg tracking-tight">CloudVault</span>
+    </div>
+
+    <!-- Storage Usage Indicator -->
+    <div class="flex items-center space-x-2 bg-neutral-800 px-3 py-1.5 rounded-full border border-neutral-700">
+      <i data-lucide="hard-drive" class="w-3.5 h-3.5 text-blue-400"></i>
+      <div class="w-16 bg-neutral-700 h-1.5 rounded-full overflow-hidden">
+        <div id="storageBar" class="bg-blue-500 h-full rounded-full transition-all duration-500" style="width: 38.5%;"></div>
+      </div>
+      <span id="storageText" class="text-[11px] font-medium text-neutral-300">38.5/100GB</span>
+    </div>
+  </header>
+
+  <!-- ================= 2. MAIN APP SCREENS ================= -->
+  <main class="max-w-md mx-auto">
+    
+    <!-- VIEW 1: PHOTOS GALLERY -->
+    <div id="photosTab" class="block">
+      <!-- Group: Today -->
+      <section class="mb-5">
+        <div class="sticky top-[57px] z-20 bg-neutral-900/90 backdrop-blur-sm px-4 py-2 text-xs font-bold uppercase tracking-wider text-neutral-400">
+          Today
+        </div>
+        <div id="galleryToday" class="grid grid-cols-3 gap-1 px-1">
+          <div class="relative aspect-square bg-neutral-800 overflow-hidden cursor-pointer active:scale-95 transition-transform">
+            <img src="https://images.unsplash.com/photo-1682687220063-4742bd7fd538?w=500" class="w-full h-full object-cover" loading="lazy">
+          </div>
+          <div class="relative aspect-square bg-neutral-800 overflow-hidden cursor-pointer active:scale-95 transition-transform">
+            <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500" class="w-full h-full object-cover" loading="lazy">
+          </div>
+        </div>
+      </section>
+
+      <!-- Group: Yesterday -->
+      <section class="mb-5">
+        <div class="sticky top-[57px] z-20 bg-neutral-900/90 backdrop-blur-sm px-4 py-2 text-xs font-bold uppercase tracking-wider text-neutral-400">
+          Yesterday
+        </div>
+        <div class="grid grid-cols-3 gap-1 px-1">
+          <div class="relative aspect-square bg-neutral-800 overflow-hidden cursor-pointer active:scale-95 transition-transform">
+            <img src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=500" class="w-full h-full object-cover" loading="lazy">
+          </div>
+          <div class="relative aspect-square bg-neutral-800 overflow-hidden cursor-pointer active:scale-95 transition-transform">
+            <img src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=500" class="w-full h-full object-cover" loading="lazy">
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- VIEW 2: SEARCH -->
+    <div id="searchTab" class="hidden p-4 space-y-4">
+      <div class="relative">
+        <i data-lucide="search" class="absolute left-3.5 top-3 w-4 h-4 text-neutral-400"></i>
+        <input type="text" placeholder="Search photos, places, albums..." class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-neutral-800 border border-neutral-700 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+      </div>
+      <div class="text-center py-16 text-neutral-400 text-xs">
+        <i data-lucide="image" class="w-10 h-10 mx-auto mb-2 opacity-40"></i>
+        Type to search inside your Cloud Vault
+      </div>
+    </div>
+
+    <!-- VIEW 3: PROFILE & MICRO-PLANS -->
+    <div id="profileTab" class="hidden px-4 py-6 space-y-5">
+      <!-- Profile Card -->
+      <div class="p-4 rounded-2xl bg-neutral-800 border border-neutral-700 flex items-center space-x-3">
+        <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white font-bold text-lg">
+          U
+        </div>
+        <div>
+          <h2 class="font-semibold text-sm">PWA Vault User</h2>
+          <p class="text-xs text-neutral-400">user@vault.cloud</p>
+        </div>
+      </div>
+
+      <!-- Micro Plans Header -->
+      <div class="text-center space-y-1">
+        <div class="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-blue-950/70 text-blue-400 text-xs font-semibold">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+          <span>Micro Storage Slices</span>
+        </div>
+        <h3 class="text-lg font-bold">Flexible Storage Passes</h3>
+      </div>
+
+      <!-- 3 Featured Plans -->
+      <div class="space-y-3">
+        <!-- Plan 1 -->
+        <div class="p-4 rounded-2xl border border-neutral-700 bg-neutral-800/60 flex justify-between items-center">
+          <div>
+            <h4 class="font-bold text-sm">Starter Pass (10 GB)</h4>
+            <p class="text-xl font-black text-blue-400">₹29 <span class="text-xs font-normal text-neutral-400">/ 1 Month</span></p>
+          </div>
+          <button class="px-4 py-2 bg-blue-600 text-white font-bold text-xs rounded-xl active:scale-95">Buy</button>
+        </div>
+
+        <!-- Plan 2 (Popular) -->
+        <div class="p-4 rounded-2xl border-2 border-blue-500 bg-blue-950/20 relative flex justify-between items-center">
+          <span class="absolute -top-2.5 right-4 bg-blue-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase">Most Popular</span>
+          <div>
+            <h4 class="font-bold text-sm">Standard Vault (50 GB)</h4>
+            <p class="text-xl font-black text-blue-400">₹99 <span class="text-xs font-normal text-neutral-400">/ 3 Months</span></p>
+          </div>
+          <button class="px-4 py-2 bg-blue-600 text-white font-bold text-xs rounded-xl active:scale-95">Buy</button>
+        </div>
+
+        <!-- Plan 3 -->
+        <div class="p-4 rounded-2xl border border-neutral-700 bg-neutral-800/60 flex justify-between items-center">
+          <div>
+            <h4 class="font-bold text-sm">Power Backup (100 GB)</h4>
+            <p class="text-xl font-black text-blue-400">₹199 <span class="text-xs font-normal text-neutral-400">/ 6 Months</span></p>
+          </div>
+          <button class="px-4 py-2 bg-blue-600 text-white font-bold text-xs rounded-xl active:scale-95">Buy</button>
+        </div>
+      </div>
+
+      <!-- Expandable 50+ Plans -->
+      <button onclick="toggleExtendedPlans()" class="w-full py-3 rounded-xl border border-dashed border-neutral-700 text-xs font-semibold flex items-center justify-center space-x-2 active:bg-neutral-800">
+        <i data-lucide="layers" class="w-4 h-4"></i>
+        <span>View All 50+ Custom Micro-Plans</span>
+        <i data-lucide="chevron-down" class="w-4 h-4 ml-1"></i>
+      </button>
+
+      <div id="extendedPlansList" class="hidden space-y-2 max-h-56 overflow-y-auto">
+        <div class="flex justify-between items-center p-3 rounded-xl bg-neutral-800 text-xs">
+          <span>1-Day Event Pass (5 GB)</span>
+          <span class="font-bold text-blue-400">₹9</span>
+        </div>
+        <div class="flex justify-between items-center p-3 rounded-xl bg-neutral-800 text-xs">
+          <span>Weekend Backup (15 GB)</span>
+          <span class="font-bold text-blue-400">₹19</span>
+        </div>
+        <div class="flex justify-between items-center p-3 rounded-xl bg-neutral-800 text-xs">
+          <span>Student Semester (30 GB)</span>
+          <span class="font-bold text-blue-400">₹49</span>
+        </div>
+        <div class="flex justify-between items-center p-3 rounded-xl bg-neutral-800 text-xs">
+          <span>Creator Pro (500 GB)</span>
+          <span class="font-bold text-blue-400">₹599</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ================= 3. FLOATING BOTTOM NAVIGATION ================= -->
+  <nav class="fixed bottom-0 left-0 right-0 z-40 bg-neutral-900/90 backdrop-blur-lg border-t border-neutral-800 px-6 py-2 pb-safe">
+    <div class="max-w-md mx-auto flex items-center justify-between">
+      <!-- Tab 1: Photos -->
+      <button onclick="switchTab('photos')" id="btnNavPhotos" class="flex flex-col items-center space-y-1 text-blue-500">
+        <i data-lucide="image" class="w-6 h-6"></i>
+        <span class="text-[10px] font-medium">Photos</span>
+      </button>
+
+      <!-- Tab 2: Search -->
+      <button onclick="switchTab('search')" id="btnNavSearch" class="flex flex-col items-center space-y-1 text-neutral-400">
+        <i data-lucide="search" class="w-6 h-6"></i>
+        <span class="text-[10px] font-medium">Search</span>
+      </button>
+
+      <!-- Prominent ADD (+) Button -->
+      <button onclick="openActionSheet()" class="flex items-center justify-center w-12 h-12 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/30 active:scale-90 transition-transform -mt-5">
+        <i data-lucide="plus" class="w-6 h-6 stroke-[2.5]"></i>
+      </button>
+
+      <!-- Tab 3: Profile/Plans -->
+      <button onclick="switchTab('profile')" id="btnNavProfile" class="flex flex-col items-center space-y-1 text-neutral-400">
+        <i data-lucide="user" class="w-6 h-6"></i>
+        <span class="text-[10px] font-medium">Plans</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ================= 4. ADD ACTION SHEET MODAL ================= -->
+  <div id="actionSheetModal" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-end justify-center p-3">
+    <div class="w-full max-w-sm bg-neutral-900 rounded-2xl p-4 space-y-2 border border-neutral-800">
+      <h4 class="text-xs font-bold text-neutral-400 uppercase tracking-wider px-2 py-1">Add Content</h4>
+      
+      <button onclick="openCameraModal()" class="w-full flex items-center space-x-3 p-3 rounded-xl hover:bg-neutral-800 active:scale-98 transition-all">
+        <i data-lucide="camera" class="w-5 h-5 text-blue-400"></i>
+        <span class="text-sm font-semibold">Take Photo / Camera</span>
+      </button>
+
+      <button onclick="document.getElementById('filePickerInput').click()" class="w-full flex items-center space-x-3 p-3 rounded-xl hover:bg-neutral-800 active:scale-98 transition-all">
+        <i data-lucide="folder-open" class="w-5 h-5 text-emerald-400"></i>
+        <span class="text-sm font-semibold">Upload from Gallery</span>
+      </button>
+
+      <input type="file" id="filePickerInput" accept="image/*,video/*" class="hidden" onchange="handleDeviceFile(event)">
+
+      <button onclick="closeActionSheet()" class="w-full py-2.5 mt-2 bg-neutral-800 rounded-xl text-xs font-bold text-neutral-300">
+        Cancel
+      </button>
+    </div>
+  </div>
+
+  <!-- ================= 5. DIRECT LIVE CAMERA MODAL ================= -->
+  <div id="cameraModal" class="hidden fixed inset-0 z-50 bg-black flex flex-col items-center justify-between">
+    <!-- Camera Top Bar -->
+    <div class="w-full flex items-center justify-between p-4 bg-gradient-to-b from-black/80 to-transparent z-10">
+      <button onclick="closeCameraModal()" class="p-2.5 rounded-full bg-neutral-800 text-white">
+        <i data-lucide="x" class="w-6 h-6"></i>
+      </button>
+      <button onclick="switchCameraFacing()" class="p-2.5 rounded-full bg-neutral-800 text-white">
+        <i data-lucide="refresh-cw" class="w-5 h-5"></i>
+      </button>
+    </div>
+
+    <!-- Video Live Viewfinder / Preview Image -->
+    <div class="relative w-full flex-1 flex items-center justify-center overflow-hidden">
+      <video id="cameraVideo" autoplay playsinline muted class="w-full h-full object-cover"></video>
+      <img id="cameraPreview" class="hidden w-full h-full object-cover" />
+      <canvas id="cameraCanvas" class="hidden"></canvas>
+
+      <!-- Upload Progress Overlay -->
+      <div id="uploadOverlay" class="hidden absolute inset-0 bg-black/85 flex flex-col items-center justify-center p-6 space-y-3">
+        <i data-lucide="upload-cloud" class="w-10 h-10 text-blue-400 animate-bounce"></i>
+        <span class="text-white text-sm font-medium">Uploading to Cloud Vault...</span>
+        <div class="w-48 bg-neutral-800 h-2 rounded-full overflow-hidden">
+          <div id="uploadBar" class="bg-blue-500 h-full w-0 transition-all duration-150"></div>
+        </div>
+        <span id="uploadPercent" class="text-xs text-neutral-400">0%</span>
+      </div>
+    </div>
+
+    <!-- Camera Bottom Controls -->
+    <div class="w-full p-6 pb-10 bg-gradient-to-t from-black/90 to-transparent flex items-center justify-center">
+      <div id="snapControls">
+        <button onclick="snapPhoto()" class="w-18 h-18 rounded-full border-4 border-white flex items-center justify-center active:scale-90 transition-transform">
+          <div class="w-14 h-14 rounded-full bg-white"></div>
+        </button>
+      </div>
+
+      <div id="previewControls" class="hidden flex space-x-4 w-full max-w-xs">
+        <button onclick="retakePhoto()" class="flex-1 py-3 bg-neutral-800 text-white rounded-xl text-xs font-bold">Retake</button>
+        <button onclick="saveAndUploadPhoto()" class="flex-1 py-3 bg-blue-600 text-white rounded-xl text-xs font-bold flex items-center justify-center">
+          <i data-lucide="upload-cloud" class="w-4 h-4 mr-1"></i> Upload
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 6. JAVASCRIPT LOGIC ================= -->
+  <script>
+    // Initialize Lucide Icons
+    lucide.createIcons();
+
+    // 1. Navigation Tab Switching
+    function switchTab(tabId) {
+      document.getElementById('photosTab').classList.add('hidden');
+      document.getElementById('searchTab').classList.add('hidden');
+      document.getElementById('profileTab').classList.add('hidden');
+
+      document.getElementById('btnNavPhotos').className = 'flex flex-col items-center space-y-1 text-neutral-400';
+      document.getElementById('btnNavSearch').className = 'flex flex-col items-center space-y-1 text-neutral-400';
+      document.getElementById('btnNavProfile').className = 'flex flex-col items-center space-y-1 text-neutral-400';
+
+      if (tabId === 'photos') {
+        document.getElementById('photosTab').classList.remove('hidden');
+        document.getElementById('btnNavPhotos').className = 'flex flex-col items-center space-y-1 text-blue-500';
+      } else if (tabId === 'search') {
+        document.getElementById('searchTab').classList.remove('hidden');
+        document.getElementById('btnNavSearch').className = 'flex flex-col items-center space-y-1 text-blue-500';
+      } else if (tabId === 'profile') {
+        document.getElementById('profileTab').classList.remove('hidden');
+        document.getElementById('btnNavProfile').className = 'flex flex-col items-center space-y-1 text-blue-500';
+      }
+      lucide.createIcons();
+    }
+
+    // 2. Action Sheet Control
+    function openActionSheet() {
+      document.getElementById('actionSheetModal').classList.remove('hidden');
+      lucide.createIcons();
+    }
+    function closeActionSheet() {
+      document.getElementById('actionSheetModal').classList.add('hidden');
+    }
+
+    // 3. 50+ Extended Plans Accordion
+    function toggleExtendedPlans() {
+      const list = document.getElementById('extendedPlansList');
+      list.classList.toggle('hidden');
+    }
+
+    // 4. HTML5 Camera Logic
+    let stream = null;
+    let facingMode = 'environment';
+    let capturedDataUrl = null;
+
+    async function openCameraModal() {
+      closeActionSheet();
+      document.getElementById('cameraModal').classList.remove('hidden');
+      document.getElementById('snapControls').classList.remove('hidden');
+      document.getElementById('previewControls').classList.add('hidden');
+      document.getElementById('cameraPreview').classList.add('hidden');
+      document.getElementById('cameraVideo').classList.remove('hidden');
+      await startCameraStream();
+      lucide.createIcons();
+    }
+
+    async function startCameraStream() {
+      try {
+        if (stream) stream.getTracks().forEach(t => t.stop());
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: facingMode }, width: { ideal: 1920 }, height: { ideal: 1080 } },
+          audio: false
+        });
+        document.getElementById('cameraVideo').srcObject = stream;
+      } catch (e) {
+        alert('Camera access denied or unavailable.');
+        closeCameraModal();
+      }
+    }
+
+    function switchCameraFacing() {
+      facingMode = (facingMode === 'environment') ? 'user' : 'environment';
+      startCameraStream();
+    }
+
+    function snapPhoto() {
+      const video = document.getElementById('cameraVideo');
+      const canvas = document.getElementById('cameraCanvas');
+      canvas.width = video.videoWidth || 1280;
+      canvas.height = video.videoHeight || 720;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      capturedDataUrl = canvas.toDataURL('image/jpeg', 0.9);
+      document.getElementById('cameraPreview').src = capturedDataUrl;
+      document.getElementById('cameraPreview').classList.remove('hidden');
+      document.getElementById('cameraVideo').classList.add('hidden');
+
+      document.getElementById('snapControls').classList.add('hidden');
+      document.getElementById('previewControls').classList.remove('hidden');
+      if (stream) stream.getTracks().forEach(t => t.stop());
+      lucide.createIcons();
+    }
+
+    function retakePhoto() {
+      capturedDataUrl = null;
+      document.getElementById('cameraPreview').classList.add('hidden');
+      document.getElementById('cameraVideo').classList.remove('hidden');
+      document.getElementById('snapControls').classList.remove('hidden');
+      document.getElementById('previewControls').classList.add('hidden');
+      startCameraStream();
+    }
+
+    function saveAndUploadPhoto() {
+      if (!capturedDataUrl) return;
+      document.getElementById('uploadOverlay').classList.remove('hidden');
+      
+      let progress = 0;
+      const bar = document.getElementById('uploadBar');
+      const text = document.getElementById('uploadPercent');
+      
+      const interval = setInterval(() => {
+        progress += 20;
+        bar.style.width = progress + '%';
+        text.innerText = progress + '%';
+        if (progress >= 100) {
+          clearInterval(interval);
+          setTimeout(() => {
+            addNewPhotoToGallery(capturedDataUrl);
+            document.getElementById('uploadOverlay').classList.add('hidden');
+            closeCameraModal();
+          }, 300);
+        }
+      }, 150);
+    }
+
+    function closeCameraModal() {
+      if (stream) stream.getTracks().forEach(t => t.stop());
+      document.getElementById('cameraModal').classList.add('hidden');
+      document.getElementById('uploadOverlay').classList.add('hidden');
+    }
+
+    // 5. Device Gallery Upload Handler
+    function handleDeviceFile(e) {
+      if (e.target.files && e.target.files[0]) {
+        const file = e.target.files[0];
+        const url = URL.createObjectURL(file);
+        addNewPhotoToGallery(url);
+        closeActionSheet();
+      }
+    }
+
+    function addNewPhotoToGallery(imgUrl) {
+      const container = document.getElementById('galleryToday');
+      const newDiv = document.createElement('div');
+      newDiv.className = 'relative aspect-square bg-neutral-800 overflow-hidden cursor-pointer active:scale-95 transition-transform animate-pulse';
+      newDiv.innerHTML = `<img src="${imgUrl}" class="w-full h-full object-cover">`;
+      container.insertBefore(newDiv, container.firstChild);
+      setTimeout(() => newDiv.classList.remove('animate-pulse'), 500);
+    }
+  </script>
+</body>
+</html>
