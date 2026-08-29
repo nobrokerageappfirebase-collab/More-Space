@@ -44,10 +44,10 @@
     }
   </style>
 </head>
-<body class="text-neutral-100 min-h-screen pb-24 font-sans antialiased">
+<body class="text-neutral-100 min-h-screen pb-28 font-sans antialiased bg-[#09090b]">
 
   <!-- ================= 1. STICKY TOP APP BAR ================= -->
-  <header class="sticky top-0 z-30 flex items-center justify-between px-4 py-3 bg-neutral-950/85 backdrop-blur-md border-b border-neutral-800">
+  <header class="sticky top-0 z-30 flex items-center justify-between px-4 py-3 bg-neutral-950/90 backdrop-blur-md border-b border-neutral-800">
     <div class="flex items-center space-x-2">
       <div class="w-8 h-8 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-md shadow-blue-500/20">
         <i data-lucide="hard-drive-upload" class="w-5 h-5"></i>
@@ -58,7 +58,7 @@
     <!-- Storage Info & Prominent Buy Storage Button -->
     <div class="flex items-center space-x-2">
       <!-- Storage Usage Pill -->
-      <div class="hidden sm:flex items-center space-x-2 bg-neutral-900 px-2.5 py-1.5 rounded-full border border-neutral-800">
+      <div onclick="switchTab('plans')" class="flex items-center space-x-2 bg-neutral-900 px-2.5 py-1.5 rounded-full border border-neutral-800 cursor-pointer active:scale-95 transition-all">
         <div class="w-12 bg-neutral-800 h-1.5 rounded-full overflow-hidden">
           <div id="storageBar" class="bg-blue-500 h-full rounded-full transition-all duration-500" style="width: 0%;"></div>
         </div>
@@ -85,7 +85,7 @@
           <h2 class="text-sm font-bold text-neutral-300 uppercase tracking-wider">My Albums</h2>
           
           <!-- + Create New Folder Button -->
-          <button onclick="openNewFolderModal()" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 text-xs font-bold active:scale-95 transition-all border border-blue-500/30">
+          <button onclick="openNewFolderModal()" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 text-xs font-bold active:scale-95 transition-all border border-blue-500/30 cursor-pointer">
             <i data-lucide="folder-plus" class="w-3.5 h-3.5"></i>
             <span>+ New Folder</span>
           </button>
@@ -112,7 +112,7 @@
           </div>
           <div class="space-y-1">
             <h3 class="font-bold text-sm text-neutral-200">Your Space is Empty</h3>
-            <p class="text-xs text-neutral-500">Tap <span class="text-blue-400 font-bold">+</span> or Share from WhatsApp to store</p>
+            <p class="text-xs text-neutral-500">Tap the blue <span class="text-blue-400 font-bold">+</span> button below to store</p>
           </div>
         </div>
       </section>
@@ -141,7 +141,7 @@
     </div>
 
     <!-- TAB 2: SEARCH -->
-    <div id="searchTab" class="hidden p-4 space-y-4">
+    <div id="searchTab" class="hidden px-4 py-6 space-y-4">
       <div class="relative">
         <i data-lucide="search" class="absolute left-3.5 top-3 w-4 h-4 text-neutral-400"></i>
         <input type="text" placeholder="Search albums, photos, or documents..." class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-neutral-900 border border-neutral-800 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -174,7 +174,7 @@
             </div>
             <p class="text-base font-extrabold text-blue-400 mt-0.5">₹9 <span class="text-[10px] font-normal text-neutral-400">/ mo</span></p>
           </div>
-          <button class="px-3.5 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs rounded-xl active:scale-95 transition-all">Select</button>
+          <button onclick="alert('Selected: Emergency Space (2 GB)')" class="px-3.5 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs rounded-xl active:scale-95 transition-all">Select</button>
         </div>
 
         <!-- 2. Basic Backup -->
@@ -186,7 +186,7 @@
             </div>
             <p class="text-base font-extrabold text-blue-400 mt-0.5">₹15 <span class="text-[10px] font-normal text-neutral-400">/ mo</span></p>
           </div>
-          <button class="px-3.5 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs rounded-xl active:scale-95 transition-all">Select</button>
+          <button onclick="alert('Selected: Basic Backup (5 GB)')" class="px-3.5 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs rounded-xl active:scale-95 transition-all">Select</button>
         </div>
 
         <!-- 3. Starter Pass -->
@@ -198,7 +198,7 @@
             </div>
             <p class="text-base font-extrabold text-blue-400 mt-0.5">₹29 <span class="text-[10px] font-normal text-neutral-400">/ mo</span></p>
           </div>
-          <button class="px-3.5 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs rounded-xl active:scale-95 transition-all">Select</button>
+          <button onclick="alert('Selected: Starter Pass (10 GB)')" class="px-3.5 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs rounded-xl active:scale-95 transition-all">Select</button>
         </div>
 
         <!-- 4. Active User Pass -->
@@ -210,7 +210,7 @@
             </div>
             <p class="text-base font-extrabold text-blue-400 mt-0.5">₹39 <span class="text-[10px] font-normal text-neutral-400">/ mo</span></p>
           </div>
-          <button class="px-3.5 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs rounded-xl active:scale-95 transition-all">Select</button>
+          <button onclick="alert('Selected: Active User Pass (15 GB)')" class="px-3.5 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs rounded-xl active:scale-95 transition-all">Select</button>
         </div>
 
         <!-- 5. Social Media Vault -->
@@ -222,7 +222,7 @@
             </div>
             <p class="text-base font-extrabold text-blue-400 mt-0.5">₹59 <span class="text-[10px] font-normal text-neutral-400">/ mo</span></p>
           </div>
-          <button class="px-3.5 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs rounded-xl active:scale-95 transition-all">Select</button>
+          <button onclick="alert('Selected: Social Media Vault (25 GB)')" class="px-3.5 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs rounded-xl active:scale-95 transition-all">Select</button>
         </div>
 
         <!-- 6. Standard Space (MOST POPULAR) -->
@@ -237,7 +237,7 @@
             </div>
             <p class="text-xl font-black text-blue-400 mt-0.5">₹99 <span class="text-xs font-normal text-neutral-300">/ mo</span></p>
           </div>
-          <button class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl active:scale-95 shadow-md shadow-blue-500/30 transition-all">
+          <button onclick="alert('Selected: Standard Space (50 GB)')" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl active:scale-95 shadow-md shadow-blue-500/30 transition-all">
             Buy Now
           </button>
         </div>
@@ -251,7 +251,7 @@
             </div>
             <p class="text-base font-extrabold text-blue-400 mt-0.5">₹149 <span class="text-[10px] font-normal text-neutral-400">/ mo</span></p>
           </div>
-          <button class="px-3.5 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs rounded-xl active:scale-95 transition-all">Select</button>
+          <button onclick="alert('Selected: Student Semester Pack (75 GB)')" class="px-3.5 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs rounded-xl active:scale-95 transition-all">Select</button>
         </div>
 
         <!-- 8. Power Backup -->
@@ -263,7 +263,7 @@
             </div>
             <p class="text-base font-extrabold text-blue-400 mt-0.5">₹199 <span class="text-[10px] font-normal text-neutral-400">/ mo</span></p>
           </div>
-          <button class="px-3.5 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs rounded-xl active:scale-95 transition-all">Select</button>
+          <button onclick="alert('Selected: Power Backup (100 GB)')" class="px-3.5 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs rounded-xl active:scale-95 transition-all">Select</button>
         </div>
 
         <!-- 9. Family Album Space -->
@@ -275,7 +275,7 @@
             </div>
             <p class="text-base font-extrabold text-blue-400 mt-0.5">₹399 <span class="text-[10px] font-normal text-neutral-400">/ mo</span></p>
           </div>
-          <button class="px-3.5 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs rounded-xl active:scale-95 transition-all">Select</button>
+          <button onclick="alert('Selected: Family Album Space (200 GB)')" class="px-3.5 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs rounded-xl active:scale-95 transition-all">Select</button>
         </div>
 
         <!-- 10. Creator Pass -->
@@ -287,7 +287,7 @@
             </div>
             <p class="text-base font-extrabold text-blue-400 mt-0.5">₹999 <span class="text-[10px] font-normal text-neutral-400">/ mo</span></p>
           </div>
-          <button class="px-3.5 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs rounded-xl active:scale-95 transition-all">Select</button>
+          <button onclick="alert('Selected: Creator Pass (500 GB)')" class="px-3.5 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs rounded-xl active:scale-95 transition-all">Select</button>
         </div>
 
         <!-- 11. Mega Space -->
@@ -299,7 +299,7 @@
             </div>
             <p class="text-base font-extrabold text-indigo-400 mt-0.5">₹1999 <span class="text-[10px] font-normal text-neutral-400">/ mo</span></p>
           </div>
-          <button class="px-3.5 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs rounded-xl active:scale-95 transition-all">Select</button>
+          <button onclick="alert('Selected: Mega Space (1 TB)')" class="px-3.5 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs rounded-xl active:scale-95 transition-all">Select</button>
         </div>
 
         <!-- 12. Pro Studio Vault -->
@@ -311,7 +311,7 @@
             </div>
             <p class="text-base font-extrabold text-purple-400 mt-0.5">₹3999 <span class="text-[10px] font-normal text-neutral-400">/ mo</span></p>
           </div>
-          <button class="px-3.5 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs rounded-xl active:scale-95 transition-all">Select</button>
+          <button onclick="alert('Selected: Pro Studio Vault (2 TB)')" class="px-3.5 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs rounded-xl active:scale-95 transition-all">Select</button>
         </div>
 
       </div>
@@ -326,24 +326,10 @@
   </main>
 
   <!-- ================= 3. CUSTOM PWA INSTALL BANNER ================= -->
-  <div id="pwaInstallBanner" class="hidden fixed bottom-20 left-3 right-3 z-40 max-w-md mx-auto p-3.5 rounded-2xl bg-neutral-900/95 backdrop-blur-md border border-blue-500/40 shadow-2xl shadow-blue-950/40 flex items-center justify-between">
+  <div id="pwaInstallBanner" class="hidden fixed bottom-24 left-3 right-3 z-40 max-w-md mx-auto p-3.5 rounded-2xl bg-neutral-900/95 backdrop-blur-md border border-blue-500/40 shadow-2xl shadow-blue-950/40 flex items-center justify-between">
     <div class="flex items-center space-x-3">
       <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shrink-0 shadow-md shadow-blue-500/30">
         <i data-lucide="hard-drive-upload" class="w-5 h-5"></i>
       </div>
       <div>
-        <h4 class="font-bold text-xs text-white">Install More Space</h4>
-        <p class="text-[10px] text-neutral-400">Add to home screen for full offline access</p>
-      </div>
-    </div>
-    <div class="flex items-center space-x-2">
-      <button onclick="dismissInstallBanner()" class="p-1.5 rounded-lg text-neutral-400 hover:text-white active:scale-95">
-        <i data-lucide="x" class="w-4 h-4"></i>
-      </button>
-      <button onclick="triggerPWAInstall()" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-md shadow-blue-500/20 active:scale-95 transition-transform">
-        Install
-      </button>
-    </div>
-  </div>
-
-  <!-- ================= 4. FLOATING BOTTOM NAVIGATION ================= -
+        <h4 class="font-
