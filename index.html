@@ -48,20 +48,28 @@
 
   <!-- ================= 1. STICKY TOP APP BAR ================= -->
   <header class="sticky top-0 z-30 flex items-center justify-between px-4 py-3 bg-neutral-950/85 backdrop-blur-md border-b border-neutral-800">
-    <div class="flex items-center space-x-2.5">
+    <div class="flex items-center space-x-2">
       <div class="w-8 h-8 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-md shadow-blue-500/20">
         <i data-lucide="hard-drive-upload" class="w-5 h-5"></i>
       </div>
-      <span class="font-bold text-lg tracking-tight text-white">More Space</span>
+      <span class="font-bold text-base sm:text-lg tracking-tight text-white">More Space</span>
     </div>
 
-    <!-- Storage Meter (Clickable: Opens Plans directly) -->
-    <div onclick="switchTab('plans')" class="flex items-center space-x-2 bg-neutral-900 hover:bg-neutral-800 px-3 py-1.5 rounded-full border border-neutral-800 cursor-pointer active:scale-95 transition-transform" title="Click to upgrade storage">
-      <i data-lucide="database" class="w-3.5 h-3.5 text-blue-400"></i>
-      <div class="w-16 bg-neutral-800 h-1.5 rounded-full overflow-hidden">
-        <div id="storageBar" class="bg-blue-500 h-full rounded-full transition-all duration-500" style="width: 0%;"></div>
+    <!-- Storage Info & Prominent Buy Storage Button -->
+    <div class="flex items-center space-x-2">
+      <!-- Storage Usage Pill -->
+      <div class="hidden sm:flex items-center space-x-2 bg-neutral-900 px-2.5 py-1.5 rounded-full border border-neutral-800">
+        <div class="w-12 bg-neutral-800 h-1.5 rounded-full overflow-hidden">
+          <div id="storageBar" class="bg-blue-500 h-full rounded-full transition-all duration-500" style="width: 0%;"></div>
+        </div>
+        <span id="storageText" class="text-[10px] font-semibold text-neutral-300">0 GB / 2 GB</span>
       </div>
-      <span id="storageText" class="text-[11px] font-semibold text-neutral-300">0 GB / 2 GB</span>
+
+      <!-- Prominent "Buy Storage" Button -->
+      <button onclick="switchTab('plans')" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-bold shadow-md shadow-blue-500/20 active:scale-95 transition-all">
+        <i data-lucide="zap" class="w-3.5 h-3.5 fill-current"></i>
+        <span>Buy Storage</span>
+      </button>
     </div>
   </header>
 
@@ -71,7 +79,7 @@
     <!-- TAB 1: ALBUMS & GALLERY VIEW -->
     <div id="galleryTab" class="block px-3 py-4 space-y-6">
       
-      <!-- Native Smartphone "Albums" Section with + New Folder Button -->
+      <!-- Native Smartphone "Albums" Section -->
       <section>
         <div class="flex items-center justify-between px-1 mb-3">
           <h2 class="text-sm font-bold text-neutral-300 uppercase tracking-wider">My Albums</h2>
@@ -83,7 +91,7 @@
           </button>
         </div>
 
-        <!-- 3-Column Dynamic Albums Grid (Default + Custom Folders) -->
+        <!-- 3-Column Dynamic Albums Grid (Permanent + Custom Folders) -->
         <div id="albumsGrid" class="grid grid-cols-3 gap-3"></div>
       </section>
 
@@ -91,7 +99,7 @@
       <section class="pt-2">
         <div class="flex items-center justify-between px-1 mb-2">
           <h3 class="text-xs font-bold text-neutral-400 uppercase tracking-wider">Recent Items</h3>
-          <span class="text-[10px] text-neutral-500">Tap item to delete/manage</span>
+          <span class="text-[10px] text-neutral-500">Tap item to view / delete</span>
         </div>
 
         <!-- Dynamic Media Grid -->
@@ -338,8 +346,4 @@
     </div>
   </div>
 
-  <!-- ================= 4. FLOATING BOTTOM NAVIGATION ================= -->
-  <nav class="fixed bottom-0 left-0 right-0 z-40 bg-neutral-950/85 backdrop-blur-lg border-t border-neutral-800/90 px-6 py-2 pb-safe">
-    <div class="max-w-md mx-auto flex items-center justify-between">
-      <button onclick="switchTab('gallery')" id="navHome" class="flex flex-col items-center space-y-1 text-blue-500">
-        <i d
+  <!-- ================= 4. FLOATING BOTTOM NAVIGATION ================= -
