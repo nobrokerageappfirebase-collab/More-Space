@@ -13,40 +13,16 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
 
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            vaultBg: '#09090b',
-          }
-        }
-      }
-    }
-  </script>
-
   <style>
-    body {
-      -webkit-tap-highlight-color: transparent;
-      user-select: none;
-      background-color: #09090b;
-    }
-    .pb-safe {
-      padding-bottom: env(safe-area-inset-bottom, 1.25rem);
-    }
-    .no-scrollbar::-webkit-scrollbar {
-      display: none;
-    }
-    .no-scrollbar {
-      -ms-overflow-style: none;
-      scrollbar-width: none;
-    }
+    body { -webkit-tap-highlight-color: transparent; user-select: none; background-color: #09090b; }
+    .pb-safe { padding-bottom: env(safe-area-inset-bottom, 1.25rem); }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
 </head>
 <body class="text-neutral-100 min-h-screen pb-28 font-sans antialiased bg-[#09090b]">
 
-  <!-- ================= 1. STICKY TOP APP BAR ================= -->
+  <!-- 1. TOP STICKY APP BAR -->
   <header class="sticky top-0 z-30 flex items-center justify-between px-4 py-3 bg-neutral-950/90 backdrop-blur-md border-b border-neutral-800">
     <div class="flex items-center space-x-2">
       <div class="w-8 h-8 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-md shadow-blue-500/20">
@@ -55,9 +31,7 @@
       <span class="font-bold text-base sm:text-lg tracking-tight text-white">More Space</span>
     </div>
 
-    <!-- Storage Info & Prominent Buy Storage Button -->
     <div class="flex items-center space-x-2">
-      <!-- Storage Usage Pill -->
       <div onclick="switchTab('plans')" class="flex items-center space-x-2 bg-neutral-900 px-2.5 py-1.5 rounded-full border border-neutral-800 cursor-pointer active:scale-95 transition-all">
         <div class="w-12 bg-neutral-800 h-1.5 rounded-full overflow-hidden">
           <div id="storageBar" class="bg-blue-500 h-full rounded-full transition-all duration-500" style="width: 0%;"></div>
@@ -65,47 +39,39 @@
         <span id="storageText" class="text-[10px] font-semibold text-neutral-300">0 GB / 2 GB</span>
       </div>
 
-      <!-- Prominent "Buy Storage" Button -->
-      <button onclick="switchTab('plans')" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-bold shadow-md shadow-blue-500/20 active:scale-95 transition-all">
+      <button onclick="switchTab('plans')" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-bold shadow-md shadow-blue-500/20 active:scale-95 transition-all cursor-pointer">
         <i data-lucide="zap" class="w-3.5 h-3.5 fill-current"></i>
         <span>Buy Storage</span>
       </button>
     </div>
   </header>
 
-  <!-- ================= 2. MAIN APP CONTENT ================= -->
+  <!-- 2. MAIN APP SCREENS -->
   <main class="max-w-md mx-auto">
     
-    <!-- TAB 1: ALBUMS & GALLERY VIEW -->
+    <!-- TAB 1: ALBUMS & GALLERY -->
     <div id="galleryTab" class="block px-3 py-4 space-y-6">
       
-      <!-- Native Smartphone "Albums" Section -->
+      <!-- Albums Section -->
       <section>
         <div class="flex items-center justify-between px-1 mb-3">
           <h2 class="text-sm font-bold text-neutral-300 uppercase tracking-wider">My Albums</h2>
-          
-          <!-- + Create New Folder Button -->
           <button onclick="openNewFolderModal()" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 text-xs font-bold active:scale-95 transition-all border border-blue-500/30 cursor-pointer">
             <i data-lucide="folder-plus" class="w-3.5 h-3.5"></i>
             <span>+ New Folder</span>
           </button>
         </div>
-
-        <!-- 3-Column Dynamic Albums Grid (Permanent + Custom Folders) -->
         <div id="albumsGrid" class="grid grid-cols-3 gap-3"></div>
       </section>
 
-      <!-- Recents / Media Feed Section -->
+      <!-- Recent Items -->
       <section class="pt-2">
         <div class="flex items-center justify-between px-1 mb-2">
           <h3 class="text-xs font-bold text-neutral-400 uppercase tracking-wider">Recent Items</h3>
-          <span class="text-[10px] text-neutral-500">Tap item to view / delete</span>
+          <span class="text-[10px] text-neutral-500">Tap to open / read / delete</span>
         </div>
-
-        <!-- Dynamic Media Grid -->
         <div id="mediaGrid" class="grid grid-cols-3 gap-1"></div>
 
-        <!-- Empty State UI -->
         <div id="emptyState" class="flex flex-col items-center justify-center text-center px-6 py-14 space-y-3 bg-neutral-900/40 rounded-2xl border border-neutral-900">
           <div class="w-14 h-14 rounded-2xl bg-neutral-900 border border-neutral-800 flex items-center justify-center text-neutral-500 shadow-inner">
             <i data-lucide="cloud-off" class="w-7 h-7 text-neutral-600"></i>
@@ -117,11 +83,26 @@
         </div>
       </section>
 
-      <!-- SEPARATE BOTTOM SECTION: UTILITIES (RECYCLE BIN) -->
-      <section class="pt-4 border-t border-neutral-900">
-        <h3 class="text-xs font-bold text-neutral-400 uppercase tracking-wider px-1 mb-2">Utilities</h3>
+      <!-- Smart Utilities -->
+      <section class="pt-4 border-t border-neutral-900 space-y-2.5">
+        <h3 class="text-xs font-bold text-neutral-400 uppercase tracking-wider px-1 mb-2">Smart Utilities</h3>
         
-        <div onclick="openRecycleBinModal()" class="flex items-center justify-between p-3.5 rounded-2xl bg-neutral-900/80 border border-neutral-800/90 hover:border-neutral-700 cursor-pointer active:scale-98 transition-all">
+        <!-- Duplicate Cleaner -->
+        <div onclick="runSmartCleanerScan()" class="flex items-center justify-between p-3.5 rounded-2xl bg-neutral-900/80 border border-neutral-800 hover:border-neutral-700 cursor-pointer active:scale-98 transition-all">
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl bg-amber-950/40 border border-amber-900/50 flex items-center justify-center text-amber-400 shrink-0">
+              <i data-lucide="sparkles" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h4 class="text-xs font-bold text-neutral-200">Duplicate & Junk Cleaner</h4>
+              <p class="text-[10px] text-neutral-500">Auto-detect identical files & free space</p>
+            </div>
+          </div>
+          <span class="text-[10px] font-bold text-amber-400 bg-amber-950/60 px-2 py-0.5 rounded-full border border-amber-900/40">Scan</span>
+        </div>
+
+        <!-- Recycle Bin -->
+        <div onclick="openRecycleBinModal()" class="flex items-center justify-between p-3.5 rounded-2xl bg-neutral-900/80 border border-neutral-800 hover:border-neutral-700 cursor-pointer active:scale-98 transition-all">
           <div class="flex items-center space-x-3">
             <div class="w-10 h-10 rounded-xl bg-red-950/40 border border-red-900/50 flex items-center justify-center text-red-400 shrink-0">
               <i data-lucide="trash-2" class="w-5 h-5"></i>
@@ -152,7 +133,7 @@
       </div>
     </div>
 
-    <!-- TAB 3: 12 SUBSCRIPTION PLANS (UPGRADE STORAGE) -->
+    <!-- TAB 3: 12 PLANS -->
     <div id="plansTab" class="hidden px-4 py-6 space-y-5">
       <div class="text-center space-y-1">
         <div class="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-blue-950/70 text-blue-400 text-xs font-semibold border border-blue-900/50">
@@ -163,173 +144,773 @@
         <p class="text-xs text-neutral-400">Choose the exact storage slice you need. Cancel anytime.</p>
       </div>
 
-      <!-- 12 Plans -->
       <div class="space-y-2.5 pt-1">
-        <!-- 1. Emergency Space -->
-        <div class="p-3.5 rounded-2xl border border-neutral-800 bg-neutral-900/70 flex justify-between items-center hover:border-neutral-700 transition-all">
-          <div>
-            <div class="flex items-center space-x-2">
-              <span class="font-bold text-xs text-neutral-200">1. Emergency Space</span>
-              <span class="text-[10px] bg-neutral-800 text-neutral-400 px-2 py-0.5 rounded-full font-semibold">2 GB</span>
-            </div>
-            <p class="text-base font-extrabold text-blue-400 mt-0.5">₹9 <span class="text-[10px] font-normal text-neutral-400">/ mo</span></p>
-          </div>
-          <button onclick="alert('Selected: Emergency Space (2 GB)')" class="px-3.5 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs rounded-xl active:scale-95 transition-all">Select</button>
+        <div class="p-3.5 rounded-2xl border border-neutral-800 bg-neutral-900/70 flex justify-between items-center">
+          <div><span class="font-bold text-xs text-neutral-200">1. Emergency Space (2 GB)</span><p class="text-base font-extrabold text-blue-400 mt-0.5">₹9 <span class="text-[10px] font-normal text-neutral-400">/ mo</span></p></div>
+          <button onclick="alert('Selected 2 GB Plan')" class="px-3.5 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs rounded-xl active:scale-95">Select</button>
         </div>
 
-        <!-- 2. Basic Backup -->
-        <div class="p-3.5 rounded-2xl border border-neutral-800 bg-neutral-900/70 flex justify-between items-center hover:border-neutral-700 transition-all">
-          <div>
-            <div class="flex items-center space-x-2">
-              <span class="font-bold text-xs text-neutral-200">2. Basic Backup</span>
-              <span class="text-[10px] bg-neutral-800 text-neutral-400 px-2 py-0.5 rounded-full font-semibold">5 GB</span>
-            </div>
-            <p class="text-base font-extrabold text-blue-400 mt-0.5">₹15 <span class="text-[10px] font-normal text-neutral-400">/ mo</span></p>
-          </div>
-          <button onclick="alert('Selected: Basic Backup (5 GB)')" class="px-3.5 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs rounded-xl active:scale-95 transition-all">Select</button>
+        <div class="p-3.5 rounded-2xl border border-neutral-800 bg-neutral-900/70 flex justify-between items-center">
+          <div><span class="font-bold text-xs text-neutral-200">2. Basic Backup (5 GB)</span><p class="text-base font-extrabold text-blue-400 mt-0.5">₹15 <span class="text-[10px] font-normal text-neutral-400">/ mo</span></p></div>
+          <button onclick="alert('Selected 5 GB Plan')" class="px-3.5 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs rounded-xl active:scale-95">Select</button>
         </div>
 
-        <!-- 3. Starter Pass -->
-        <div class="p-3.5 rounded-2xl border border-neutral-800 bg-neutral-900/70 flex justify-between items-center hover:border-neutral-700 transition-all">
-          <div>
-            <div class="flex items-center space-x-2">
-              <span class="font-bold text-xs text-neutral-200">3. Starter Pass</span>
-              <span class="text-[10px] bg-neutral-800 text-neutral-400 px-2 py-0.5 rounded-full font-semibold">10 GB</span>
-            </div>
-            <p class="text-base font-extrabold text-blue-400 mt-0.5">₹29 <span class="text-[10px] font-normal text-neutral-400">/ mo</span></p>
-          </div>
-          <button onclick="alert('Selected: Starter Pass (10 GB)')" class="px-3.5 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs rounded-xl active:scale-95 transition-all">Select</button>
+        <div class="p-3.5 rounded-2xl border border-neutral-800 bg-neutral-900/70 flex justify-between items-center">
+          <div><span class="font-bold text-xs text-neutral-200">3. Starter Pass (10 GB)</span><p class="text-base font-extrabold text-blue-400 mt-0.5">₹29 <span class="text-[10px] font-normal text-neutral-400">/ mo</span></p></div>
+          <button onclick="alert('Selected 10 GB Plan')" class="px-3.5 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs rounded-xl active:scale-95">Select</button>
         </div>
 
-        <!-- 4. Active User Pass -->
-        <div class="p-3.5 rounded-2xl border border-neutral-800 bg-neutral-900/70 flex justify-between items-center hover:border-neutral-700 transition-all">
-          <div>
-            <div class="flex items-center space-x-2">
-              <span class="font-bold text-xs text-neutral-200">4. Active User Pass</span>
-              <span class="text-[10px] bg-neutral-800 text-neutral-400 px-2 py-0.5 rounded-full font-semibold">15 GB</span>
-            </div>
-            <p class="text-base font-extrabold text-blue-400 mt-0.5">₹39 <span class="text-[10px] font-normal text-neutral-400">/ mo</span></p>
-          </div>
-          <button onclick="alert('Selected: Active User Pass (15 GB)')" class="px-3.5 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs rounded-xl active:scale-95 transition-all">Select</button>
+        <div class="p-3.5 rounded-2xl border border-neutral-800 bg-neutral-900/70 flex justify-between items-center">
+          <div><span class="font-bold text-xs text-neutral-200">4. Active User Pass (15 GB)</span><p class="text-base font-extrabold text-blue-400 mt-0.5">₹39 <span class="text-[10px] font-normal text-neutral-400">/ mo</span></p></div>
+          <button onclick="alert('Selected 15 GB Plan')" class="px-3.5 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs rounded-xl active:scale-95">Select</button>
         </div>
 
-        <!-- 5. Social Media Vault -->
-        <div class="p-3.5 rounded-2xl border border-neutral-800 bg-neutral-900/70 flex justify-between items-center hover:border-neutral-700 transition-all">
-          <div>
-            <div class="flex items-center space-x-2">
-              <span class="font-bold text-xs text-neutral-200">5. Social Media Vault</span>
-              <span class="text-[10px] bg-neutral-800 text-neutral-400 px-2 py-0.5 rounded-full font-semibold">25 GB</span>
-            </div>
-            <p class="text-base font-extrabold text-blue-400 mt-0.5">₹59 <span class="text-[10px] font-normal text-neutral-400">/ mo</span></p>
-          </div>
-          <button onclick="alert('Selected: Social Media Vault (25 GB)')" class="px-3.5 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs rounded-xl active:scale-95 transition-all">Select</button>
+        <div class="p-3.5 rounded-2xl border border-neutral-800 bg-neutral-900/70 flex justify-between items-center">
+          <div><span class="font-bold text-xs text-neutral-200">5. Social Media Vault (25 GB)</span><p class="text-base font-extrabold text-blue-400 mt-0.5">₹59 <span class="text-[10px] font-normal text-neutral-400">/ mo</span></p></div>
+          <button onclick="alert('Selected 25 GB Plan')" class="px-3.5 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs rounded-xl active:scale-95">Select</button>
         </div>
 
         <!-- 6. Standard Space (MOST POPULAR) -->
         <div class="p-4 rounded-2xl border-2 border-blue-500 bg-gradient-to-b from-blue-950/40 via-neutral-900 to-neutral-900 relative flex justify-between items-center shadow-lg shadow-blue-950/40">
-          <span class="absolute -top-2.5 right-4 bg-blue-600 text-white text-[9px] font-extrabold px-3 py-0.5 rounded-full uppercase tracking-wider shadow-sm">
-            ⭐ Most Popular
-          </span>
-          <div>
-            <div class="flex items-center space-x-2">
-              <span class="font-bold text-sm text-white">6. Standard Space</span>
-              <span class="text-[10px] bg-blue-600 text-white px-2 py-0.5 rounded-full font-bold">50 GB</span>
-            </div>
-            <p class="text-xl font-black text-blue-400 mt-0.5">₹99 <span class="text-xs font-normal text-neutral-300">/ mo</span></p>
-          </div>
-          <button onclick="alert('Selected: Standard Space (50 GB)')" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl active:scale-95 shadow-md shadow-blue-500/30 transition-all">
-            Buy Now
-          </button>
+          <span class="absolute -top-2.5 right-4 bg-blue-600 text-white text-[9px] font-extrabold px-3 py-0.5 rounded-full uppercase tracking-wider">⭐ Most Popular</span>
+          <div><span class="font-bold text-sm text-white">6. Standard Space (50 GB)</span><p class="text-xl font-black text-blue-400 mt-0.5">₹99 <span class="text-xs font-normal text-neutral-300">/ mo</span></p></div>
+          <button onclick="alert('Selected 50 GB Plan')" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl active:scale-95 shadow-md shadow-blue-500/30">Buy Now</button>
         </div>
 
-        <!-- 7. Student Semester Pack -->
-        <div class="p-3.5 rounded-2xl border border-neutral-800 bg-neutral-900/70 flex justify-between items-center hover:border-neutral-700 transition-all">
-          <div>
-            <div class="flex items-center space-x-2">
-              <span class="font-bold text-xs text-neutral-200">7. Student Semester Pack</span>
-              <span class="text-[10px] bg-neutral-800 text-neutral-400 px-2 py-0.5 rounded-full font-semibold">75 GB</span>
-            </div>
-            <p class="text-base font-extrabold text-blue-400 mt-0.5">₹149 <span class="text-[10px] font-normal text-neutral-400">/ mo</span></p>
-          </div>
-          <button onclick="alert('Selected: Student Semester Pack (75 GB)')" class="px-3.5 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs rounded-xl active:scale-95 transition-all">Select</button>
+        <div class="p-3.5 rounded-2xl border border-neutral-800 bg-neutral-900/70 flex justify-between items-center">
+          <div><span class="font-bold text-xs text-neutral-200">7. Student Semester (75 GB)</span><p class="text-base font-extrabold text-blue-400 mt-0.5">₹149 <span class="text-[10px] font-normal text-neutral-400">/ mo</span></p></div>
+          <button onclick="alert('Selected 75 GB Plan')" class="px-3.5 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs rounded-xl active:scale-95">Select</button>
         </div>
 
-        <!-- 8. Power Backup -->
-        <div class="p-3.5 rounded-2xl border border-neutral-800 bg-neutral-900/70 flex justify-between items-center hover:border-neutral-700 transition-all">
-          <div>
-            <div class="flex items-center space-x-2">
-              <span class="font-bold text-xs text-neutral-200">8. Power Backup</span>
-              <span class="text-[10px] bg-neutral-800 text-neutral-400 px-2 py-0.5 rounded-full font-semibold">100 GB</span>
-            </div>
-            <p class="text-base font-extrabold text-blue-400 mt-0.5">₹199 <span class="text-[10px] font-normal text-neutral-400">/ mo</span></p>
-          </div>
-          <button onclick="alert('Selected: Power Backup (100 GB)')" class="px-3.5 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs rounded-xl active:scale-95 transition-all">Select</button>
+        <div class="p-3.5 rounded-2xl border border-neutral-800 bg-neutral-900/70 flex justify-between items-center">
+          <div><span class="font-bold text-xs text-neutral-200">8. Power Backup (100 GB)</span><p class="text-base font-extrabold text-blue-400 mt-0.5">₹199 <span class="text-[10px] font-normal text-neutral-400">/ mo</span></p></div>
+          <button onclick="alert('Selected 100 GB Plan')" class="px-3.5 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs rounded-xl active:scale-95">Select</button>
         </div>
 
-        <!-- 9. Family Album Space -->
-        <div class="p-3.5 rounded-2xl border border-neutral-800 bg-neutral-900/70 flex justify-between items-center hover:border-neutral-700 transition-all">
-          <div>
-            <div class="flex items-center space-x-2">
-              <span class="font-bold text-xs text-neutral-200">9. Family Album Space</span>
-              <span class="text-[10px] bg-neutral-800 text-neutral-400 px-2 py-0.5 rounded-full font-semibold">200 GB</span>
-            </div>
-            <p class="text-base font-extrabold text-blue-400 mt-0.5">₹399 <span class="text-[10px] font-normal text-neutral-400">/ mo</span></p>
-          </div>
-          <button onclick="alert('Selected: Family Album Space (200 GB)')" class="px-3.5 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs rounded-xl active:scale-95 transition-all">Select</button>
+        <div class="p-3.5 rounded-2xl border border-neutral-800 bg-neutral-900/70 flex justify-between items-center">
+          <div><span class="font-bold text-xs text-neutral-200">9. Family Album (200 GB)</span><p class="text-base font-extrabold text-blue-400 mt-0.5">₹399 <span class="text-[10px] font-normal text-neutral-400">/ mo</span></p></div>
+          <button onclick="alert('Selected 200 GB Plan')" class="px-3.5 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs rounded-xl active:scale-95">Select</button>
         </div>
 
-        <!-- 10. Creator Pass -->
-        <div class="p-3.5 rounded-2xl border border-neutral-800 bg-neutral-900/70 flex justify-between items-center hover:border-neutral-700 transition-all">
-          <div>
-            <div class="flex items-center space-x-2">
-              <span class="font-bold text-xs text-neutral-200">10. Creator Pass</span>
-              <span class="text-[10px] bg-neutral-800 text-neutral-400 px-2 py-0.5 rounded-full font-semibold">500 GB</span>
-            </div>
-            <p class="text-base font-extrabold text-blue-400 mt-0.5">₹999 <span class="text-[10px] font-normal text-neutral-400">/ mo</span></p>
-          </div>
-          <button onclick="alert('Selected: Creator Pass (500 GB)')" class="px-3.5 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs rounded-xl active:scale-95 transition-all">Select</button>
+        <div class="p-3.5 rounded-2xl border border-neutral-800 bg-neutral-900/70 flex justify-between items-center">
+          <div><span class="font-bold text-xs text-neutral-200">10. Creator Pass (500 GB)</span><p class="text-base font-extrabold text-blue-400 mt-0.5">₹999 <span class="text-[10px] font-normal text-neutral-400">/ mo</span></p></div>
+          <button onclick="alert('Selected 500 GB Plan')" class="px-3.5 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs rounded-xl active:scale-95">Select</button>
         </div>
 
-        <!-- 11. Mega Space -->
-        <div class="p-3.5 rounded-2xl border border-neutral-800 bg-neutral-900/70 flex justify-between items-center hover:border-neutral-700 transition-all">
-          <div>
-            <div class="flex items-center space-x-2">
-              <span class="font-bold text-xs text-neutral-200">11. Mega Space</span>
-              <span class="text-[10px] bg-indigo-950 text-indigo-400 border border-indigo-800 px-2 py-0.5 rounded-full font-bold">1 TB</span>
-            </div>
-            <p class="text-base font-extrabold text-indigo-400 mt-0.5">₹1999 <span class="text-[10px] font-normal text-neutral-400">/ mo</span></p>
-          </div>
-          <button onclick="alert('Selected: Mega Space (1 TB)')" class="px-3.5 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs rounded-xl active:scale-95 transition-all">Select</button>
+        <div class="p-3.5 rounded-2xl border border-neutral-800 bg-neutral-900/70 flex justify-between items-center">
+          <div><span class="font-bold text-xs text-neutral-200">11. Mega Space (1 TB)</span><p class="text-base font-extrabold text-indigo-400 mt-0.5">₹1999 <span class="text-[10px] font-normal text-neutral-400">/ mo</span></p></div>
+          <button onclick="alert('Selected 1 TB Plan')" class="px-3.5 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs rounded-xl active:scale-95">Select</button>
         </div>
 
-        <!-- 12. Pro Studio Vault -->
-        <div class="p-3.5 rounded-2xl border border-neutral-800 bg-neutral-900/70 flex justify-between items-center hover:border-neutral-700 transition-all">
-          <div>
-            <div class="flex items-center space-x-2">
-              <span class="font-bold text-xs text-neutral-200">12. Pro Studio Vault</span>
-              <span class="text-[10px] bg-purple-950 text-purple-400 border border-purple-800 px-2 py-0.5 rounded-full font-bold">2 TB</span>
-            </div>
-            <p class="text-base font-extrabold text-purple-400 mt-0.5">₹3999 <span class="text-[10px] font-normal text-neutral-400">/ mo</span></p>
-          </div>
-          <button onclick="alert('Selected: Pro Studio Vault (2 TB)')" class="px-3.5 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs rounded-xl active:scale-95 transition-all">Select</button>
+        <div class="p-3.5 rounded-2xl border border-neutral-800 bg-neutral-900/70 flex justify-between items-center">
+          <div><span class="font-bold text-xs text-neutral-200">12. Pro Studio Vault (2 TB)</span><p class="text-base font-extrabold text-purple-400 mt-0.5">₹3999 <span class="text-[10px] font-normal text-neutral-400">/ mo</span></p></div>
+          <button onclick="alert('Selected 2 TB Plan')" class="px-3.5 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs rounded-xl active:scale-95">Select</button>
         </div>
-
-      </div>
-
-      <!-- Trust Indicator -->
-      <div class="flex items-center justify-center space-x-2 text-neutral-500 text-xs pt-4">
-        <i data-lucide="shield-check" class="w-4 h-4 text-emerald-500"></i>
-        <span>Instant Activation • End-to-End Encrypted Cloud</span>
       </div>
     </div>
 
   </main>
 
-  <!-- ================= 3. CUSTOM PWA INSTALL BANNER ================= -->
-  <div id="pwaInstallBanner" class="hidden fixed bottom-24 left-3 right-3 z-40 max-w-md mx-auto p-3.5 rounded-2xl bg-neutral-900/95 backdrop-blur-md border border-blue-500/40 shadow-2xl shadow-blue-950/40 flex items-center justify-between">
+  <!-- 3. PWA INSTALL BANNER -->
+  <div id="pwaInstallBanner" class="hidden fixed bottom-24 left-3 right-3 z-40 max-w-md mx-auto p-3.5 rounded-2xl bg-neutral-900/95 backdrop-blur-md border border-blue-500/40 shadow-2xl flex items-center justify-between">
     <div class="flex items-center space-x-3">
-      <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shrink-0 shadow-md shadow-blue-500/30">
+      <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shrink-0">
         <i data-lucide="hard-drive-upload" class="w-5 h-5"></i>
       </div>
       <div>
-        <h4 class="font-
+        <h4 class="font-bold text-xs text-white">Install More Space</h4>
+        <p class="text-[10px] text-neutral-400">Add to home screen for full offline access</p>
+      </div>
+    </div>
+    <div class="flex items-center space-x-2">
+      <button onclick="dismissInstallBanner()" class="p-1.5 text-neutral-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+      <button onclick="triggerPWAInstall()" class="px-3 py-1.5 bg-blue-600 text-white font-bold text-xs rounded-xl active:scale-95">Install</button>
+    </div>
+  </div>
+
+  <!-- 4. FLOATING BOTTOM NAVIGATION -->
+  <nav class="fixed bottom-0 left-0 right-0 z-40 bg-neutral-950/90 backdrop-blur-xl border-t border-neutral-800/90 px-6 py-2.5 pb-safe">
+    <div class="max-w-md mx-auto flex items-center justify-between relative">
+      <button onclick="switchTab('gallery')" id="navHome" class="flex flex-col items-center space-y-1 text-blue-500 cursor-pointer">
+        <i data-lucide="image" class="w-5 h-5"></i>
+        <span class="text-[10px] font-semibold">Home</span>
+      </button>
+
+      <button onclick="switchTab('search')" id="navSearch" class="flex flex-col items-center space-y-1 text-neutral-400 cursor-pointer">
+        <i data-lucide="search" class="w-5 h-5"></i>
+        <span class="text-[10px] font-semibold">Search</span>
+      </button>
+
+      <!-- Center Plus Button -->
+      <div class="relative -top-5 flex items-center justify-center">
+        <button onclick="openActionSheet()" aria-label="Add Content" class="w-12 h-12 rounded-full bg-blue-600 hover:bg-blue-500 text-white flex items-center justify-center shadow-lg shadow-blue-500/40 active:scale-90 transition-transform cursor-pointer border-2 border-neutral-950">
+          <i data-lucide="plus" class="w-7 h-7 stroke-[2.5]"></i>
+        </button>
+      </div>
+
+      <button onclick="switchTab('plans')" id="navPlans" class="flex flex-col items-center space-y-1 text-neutral-400 cursor-pointer">
+        <i data-lucide="credit-card" class="w-5 h-5"></i>
+        <span class="text-[10px] font-semibold">Buy Plans</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- 5. CREATE NEW FOLDER MODAL -->
+  <div id="newFolderModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="w-full max-w-xs bg-neutral-900 rounded-3xl p-5 border border-neutral-800 text-center space-y-4 shadow-2xl">
+      <div class="w-12 h-12 rounded-2xl bg-blue-600/20 text-blue-400 flex items-center justify-center mx-auto">
+        <i data-lucide="folder-plus" class="w-6 h-6"></i>
+      </div>
+      <div class="space-y-1">
+        <h3 class="font-bold text-base text-white">Create New Folder</h3>
+        <p class="text-xs text-neutral-400">Enter a name for your new album</p>
+      </div>
+      <input type="text" id="newFolderNameInput" placeholder="Folder name (e.g., Vacation)" class="w-full px-3.5 py-2.5 rounded-xl bg-neutral-800 border border-neutral-700 text-xs text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+      <div class="flex space-x-2 pt-1">
+        <button onclick="closeNewFolderModal()" class="flex-1 py-2.5 bg-neutral-800 text-neutral-300 rounded-xl text-xs font-bold active:scale-95">Cancel</button>
+        <button onclick="submitNewFolder()" class="flex-1 py-2.5 bg-blue-600 text-white rounded-xl text-xs font-bold active:scale-95 shadow-md shadow-blue-500/20">Create</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. ADD (+) ACTION SHEET -->
+  <div id="actionSheetModal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-xs flex items-end justify-center p-3">
+    <div class="w-full max-w-sm bg-neutral-900 rounded-3xl p-4 space-y-2 border border-neutral-800 shadow-2xl">
+      <div class="w-10 h-1 bg-neutral-700 rounded-full mx-auto mb-2"></div>
+      
+      <button onclick="openCameraModal()" class="w-full flex items-center space-x-3.5 p-3 rounded-2xl hover:bg-neutral-800 active:scale-98 transition-all text-left">
+        <div class="w-10 h-10 rounded-xl bg-blue-600/20 text-blue-400 flex items-center justify-center shrink-0"><i data-lucide="camera" class="w-5 h-5"></i></div>
+        <div><div class="text-sm font-semibold text-white">Take Photo / Video</div><div class="text-[11px] text-neutral-400">Store directly to More Space</div></div>
+      </button>
+
+      <button onclick="triggerFilePicker('galleryInput')" class="w-full flex items-center space-x-3.5 p-3 rounded-2xl hover:bg-neutral-800 active:scale-98 transition-all text-left">
+        <div class="w-10 h-10 rounded-xl bg-emerald-600/20 text-emerald-400 flex items-center justify-center shrink-0"><i data-lucide="images" class="w-5 h-5"></i></div>
+        <div><div class="text-sm font-semibold text-white">Upload from Gallery</div><div class="text-[11px] text-neutral-400">Select photos & videos from device</div></div>
+      </button>
+
+      <button onclick="triggerFilePicker('fileInput')" class="w-full flex items-center space-x-3.5 p-3 rounded-2xl hover:bg-neutral-800 active:scale-98 transition-all text-left">
+        <div class="w-10 h-10 rounded-xl bg-amber-600/20 text-amber-400 flex items-center justify-center shrink-0"><i data-lucide="file-text" class="w-5 h-5"></i></div>
+        <div><div class="text-sm font-semibold text-white">Upload PDF / Documents</div><div class="text-[11px] text-neutral-400">Read & store PDFs directly inside app</div></div>
+      </button>
+
+      <input type="file" id="galleryInput" accept="image/*,video/*" class="hidden" onchange="promptStorageChoice(event, 'image')">
+      <input type="file" id="fileInput" accept=".pdf,.doc,.docx,.txt,application/*" class="hidden" onchange="promptStorageChoice(event, 'file')">
+
+      <button onclick="closeActionSheet()" class="w-full py-3 mt-1 bg-neutral-800 text-neutral-300 rounded-2xl text-xs font-bold active:scale-98">Cancel</button>
+    </div>
+  </div>
+
+  <!-- 7. WHERE TO STORE DIALOG -->
+  <div id="storageChoiceModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="w-full max-w-xs bg-neutral-900 rounded-3xl p-5 border border-neutral-800 text-center space-y-4 shadow-2xl">
+      <div class="w-12 h-12 rounded-2xl bg-blue-600/20 text-blue-400 flex items-center justify-center mx-auto">
+        <i data-lucide="help-circle" class="w-6 h-6"></i>
+      </div>
+      <div class="space-y-1">
+        <h3 class="font-bold text-base text-white">Where to Store?</h3>
+        <p id="storagePromptSubtitle" class="text-xs text-neutral-400 truncate">Choose destination folder</p>
+      </div>
+
+      <div class="text-left space-y-1">
+        <label class="text-[10px] font-bold text-neutral-400 uppercase tracking-wider px-1">Destination Folder</label>
+        <select id="destinationFolderSelect" class="w-full px-3 py-2 rounded-xl bg-neutral-800 border border-neutral-700 text-xs text-white focus:outline-none focus:ring-2 focus:ring-blue-500"></select>
+      </div>
+
+      <div class="space-y-2 pt-1">
+        <button onclick="confirmStoreLocation('cloud')" class="w-full flex items-center justify-between p-3.5 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs active:scale-95 transition-all">
+          <div class="flex items-center space-x-2.5"><i data-lucide="cloud" class="w-4 h-4"></i><span>Store in More Space</span></div>
+          <span class="text-[10px] bg-blue-500 px-2 py-0.5 rounded-full">Cloud</span>
+        </button>
+
+        <button onclick="confirmStoreLocation('local')" class="w-full flex items-center justify-between p-3.5 rounded-2xl bg-neutral-800 hover:bg-neutral-700 text-neutral-200 font-semibold text-xs active:scale-95 transition-all">
+          <div class="flex items-center space-x-2.5"><i data-lucide="smartphone" class="w-4 h-4 text-emerald-400"></i><span>Mobile Storage</span></div>
+          <span class="text-[10px] bg-neutral-700 text-neutral-400 px-2 py-0.5 rounded-full">Local</span>
+        </button>
+      </div>
+
+      <button onclick="closeStorageChoiceModal()" class="text-xs text-neutral-500 font-medium pt-1">Dismiss</button>
+    </div>
+  </div>
+
+  <!-- 8. INBUILT PDF & DOCUMENT READER -->
+  <div id="documentReaderModal" class="hidden fixed inset-0 z-50 bg-neutral-950 flex flex-col justify-between">
+    <div class="p-3.5 border-b border-neutral-800 flex items-center justify-between bg-neutral-900/90 backdrop-blur-md">
+      <div class="flex items-center space-x-2.5 overflow-hidden">
+        <button onclick="closeDocumentReaderModal()" class="p-2 rounded-xl bg-neutral-800 text-neutral-300 active:scale-95 shrink-0"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>
+        <div class="overflow-hidden">
+          <h3 id="readerDocTitle" class="font-bold text-xs text-white truncate">Document Viewer</h3>
+          <p class="text-[10px] text-emerald-400 font-medium">Inbuilt PDF & Document Reader</p>
+        </div>
+      </div>
+      <button onclick="deleteCurrentDoc()" class="p-2 rounded-xl bg-red-950/60 text-red-400 border border-red-900/60 active:scale-95 shrink-0"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+    </div>
+    <div class="flex-1 w-full bg-neutral-900 p-2 overflow-hidden flex items-center justify-center" id="readerContainer"></div>
+  </div>
+
+  <!-- 9. PHOTO & VIDEO FULL DETAILS MODAL -->
+  <div id="itemDetailModal" class="hidden fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex flex-col justify-between p-4">
+    <div class="w-full flex items-center justify-between">
+      <button onclick="closeItemDetailModal()" class="p-2.5 rounded-full bg-neutral-900 text-white active:scale-95"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>
+      <span id="detailBadge" class="text-xs px-3 py-1 rounded-full bg-neutral-800 text-blue-400 font-medium"></span>
+      <button onclick="moveCurrentItemToRecycleBin()" class="p-2.5 rounded-full bg-red-950/80 text-red-400 border border-red-900 active:scale-95"><i data-lucide="trash-2" class="w-5 h-5"></i></button>
+    </div>
+    <div class="flex-1 flex items-center justify-center my-4 overflow-hidden" id="detailMediaContainer"></div>
+    <div class="text-center p-2 bg-neutral-900/80 rounded-2xl border border-neutral-800">
+      <p id="detailFileName" class="text-xs text-neutral-300 truncate"></p>
+    </div>
+  </div>
+
+  <!-- 10. SMART DUPLICATE CLEANER SCANNER MODAL -->
+  <div id="smartCleanerModal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="w-full max-w-sm bg-neutral-900 rounded-3xl p-5 border border-neutral-800 text-center space-y-4 shadow-2xl">
+      <div class="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center mx-auto">
+        <i data-lucide="sparkles" class="w-6 h-6"></i>
+      </div>
+      <div class="space-y-1">
+        <h3 class="font-bold text-base text-white">Duplicate & Junk Scan</h3>
+        <p id="cleanerScanResult" class="text-xs text-neutral-400">Scanning for identical files...</p>
+      </div>
+
+      <div id="duplicateListContainer" class="hidden max-h-48 overflow-y-auto space-y-2 text-left"></div>
+
+      <div class="flex space-x-2 pt-2">
+        <button onclick="closeSmartCleanerModal()" class="flex-1 py-2.5 bg-neutral-800 text-neutral-300 rounded-xl text-xs font-bold active:scale-95">Cancel</button>
+        <button id="cleanDuplicatesBtn" onclick="cleanDuplicates()" class="hidden flex-1 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold active:scale-95 shadow-md shadow-red-500/20">Delete All</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 11. RECYCLE BIN DEDICATED MODAL -->
+  <div id="recycleBinModal" class="hidden fixed inset-0 z-50 bg-neutral-950 flex flex-col justify-between">
+    <div class="p-4 border-b border-neutral-800 flex items-center justify-between bg-neutral-900/50">
+      <div class="flex items-center space-x-3">
+        <button onclick="closeRecycleBinModal()" class="p-2 rounded-xl bg-neutral-800 text-neutral-300 active:scale-95"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>
+        <div>
+          <h3 class="font-bold text-sm text-white">Recycle Bin</h3>
+          <p class="text-[10px] text-neutral-400">Items stay here indefinitely until deleted</p>
+        </div>
+      </div>
+      <button onclick="emptyRecycleBin()" class="text-xs font-semibold text-red-400 hover:text-red-300 bg-red-950/40 px-3 py-1.5 rounded-xl border border-red-900/50 active:scale-95">Empty Bin</button>
+    </div>
+
+    <div class="flex-1 overflow-y-auto p-3">
+      <div id="recycleBinGrid" class="grid grid-cols-2 gap-2.5"></div>
+      <div id="recycleBinEmptyState" class="flex flex-col items-center justify-center text-center py-24 space-y-2">
+        <i data-lucide="trash-2" class="w-10 h-10 text-neutral-700 mb-1"></i>
+        <h4 class="text-xs font-bold text-neutral-400">Recycle Bin is Empty</h4>
+        <p class="text-[11px] text-neutral-600">Deleted photos and files will appear here</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 12. HTML5 CAMERA MODAL -->
+  <div id="cameraModal" class="hidden fixed inset-0 z-50 bg-black flex flex-col items-center justify-between">
+    <div class="w-full flex items-center justify-between p-4 bg-gradient-to-b from-black/80 to-transparent z-10">
+      <button onclick="closeCameraModal()" class="p-2.5 rounded-full bg-neutral-900/80 text-white active:scale-95"><i data-lucide="x" class="w-6 h-6"></i></button>
+      <button onclick="switchCameraFacing()" class="p-2.5 rounded-full bg-neutral-900/80 text-white active:scale-95"><i data-lucide="refresh-cw" class="w-5 h-5"></i></button>
+    </div>
+
+    <div class="relative w-full flex-1 flex items-center justify-center overflow-hidden">
+      <video id="cameraVideo" autoplay playsinline muted class="w-full h-full object-cover"></video>
+      <img id="cameraPreview" class="hidden w-full h-full object-cover" />
+      <canvas id="cameraCanvas" class="hidden"></canvas>
+    </div>
+
+    <div class="w-full p-6 pb-12 bg-gradient-to-t from-black/90 to-transparent flex items-center justify-center">
+      <div id="snapControls">
+        <button onclick="snapPhoto()" class="w-20 h-20 rounded-full border-4 border-white flex items-center justify-center active:scale-90 transition-transform">
+          <div class="w-16 h-16 rounded-full bg-white"></div>
+        </button>
+      </div>
+
+      <div id="previewControls" class="hidden flex space-x-4 w-full max-w-xs">
+        <button onclick="retakePhoto()" class="flex-1 py-3 bg-neutral-800 text-white rounded-2xl text-xs font-bold">Retake</button>
+        <button onclick="openStorageChoiceForCamera()" class="flex-1 py-3 bg-blue-600 text-white rounded-2xl text-xs font-bold flex items-center justify-center"><i data-lucide="check" class="w-4 h-4 mr-1"></i> Continue</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 13. JAVASCRIPT APP LOGIC -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(e => console.log(e));
+      });
+    }
+
+    let deferredInstallPrompt = null;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredInstallPrompt = e;
+      const b = document.getElementById('pwaInstallBanner');
+      if (b) { b.classList.remove('hidden'); lucide.createIcons(); }
+    });
+
+    async function triggerPWAInstall() {
+      if (!deferredInstallPrompt) return;
+      deferredInstallPrompt.prompt();
+      const { outcome } = await deferredInstallPrompt.userChoice;
+      if (outcome === 'accepted') dismissInstallBanner();
+      deferredInstallPrompt = null;
+    }
+
+    function dismissInstallBanner() {
+      const b = document.getElementById('pwaInstallBanner');
+      if (b) b.classList.add('hidden');
+    }
+
+    // App State
+    let usedBytes = 0;
+    const totalBytes = 2 * 1024 * 1024 * 1024; // 2 GB
+    let mediaItems = [];
+    let recycleBinItems = [];
+    let currentDetailItem = null;
+    let currentReadingDoc = null;
+    let duplicateItemsFound = [];
+
+    let albumsList = [
+      { id: 'all', name: 'All Media', icon: 'images', color: 'text-blue-400' },
+      { id: 'camera', name: 'Camera', icon: 'camera', color: 'text-emerald-400' },
+      { id: 'videos', name: 'Videos', icon: 'video', color: 'text-purple-400' },
+      { id: 'whatsapp', name: 'WhatsApp', icon: 'message-circle', color: 'text-green-400' },
+      { id: 'files', name: 'PDFs & Files', icon: 'file-text', color: 'text-amber-400' },
+      { id: 'downloads', name: 'Downloads', icon: 'download', color: 'text-cyan-400' },
+      { id: 'bluetooth', name: 'Bluetooth', icon: 'bluetooth', color: 'text-indigo-400' },
+    ];
+
+    function updateStorageDisplay() {
+      const usedGB = (usedBytes / (1024 * 1024 * 1024)).toFixed(2);
+      const percentage = Math.min((usedBytes / totalBytes) * 100, 100);
+      document.getElementById('storageText').innerText = `${usedGB} GB / 2 GB`;
+      document.getElementById('storageBar').style.width = `${percentage}%`;
+    }
+
+    function renderAlbumsGrid() {
+      const container = document.getElementById('albumsGrid');
+      if (!container) return;
+      container.innerHTML = '';
+
+      albumsList.forEach(album => {
+        let count = 0;
+        if (album.id === 'all') count = mediaItems.length;
+        else if (album.id === 'videos') count = mediaItems.filter(i => i.mediaType === 'video').length;
+        else if (album.id === 'files') count = mediaItems.filter(i => i.mediaType === 'file').length;
+        else count = mediaItems.filter(i => i.folderId === album.id).length;
+
+        const card = document.createElement('div');
+        card.className = 'flex flex-col space-y-1.5 cursor-pointer active:scale-95 transition-transform group';
+        card.innerHTML = `
+          <div class="aspect-square rounded-2xl bg-neutral-900 border border-neutral-800 flex items-center justify-center ${album.color} group-hover:border-neutral-700 shadow-inner">
+            <i data-lucide="${album.icon}" class="w-7 h-7"></i>
+          </div>
+          <div class="px-0.5">
+            <h4 class="font-semibold text-xs text-neutral-200 truncate">${album.name}</h4>
+            <p class="text-[11px] text-neutral-500">${count}</p>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+
+      const binCount = document.getElementById('countRecycleBin');
+      if (binCount) binCount.innerText = recycleBinItems.length;
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function openNewFolderModal() {
+      document.getElementById('newFolderNameInput').value = '';
+      document.getElementById('newFolderModal').classList.remove('hidden');
+      if (window.lucide) lucide.createIcons();
+    }
+    function closeNewFolderModal() { document.getElementById('newFolderModal').classList.add('hidden'); }
+    function submitNewFolder() {
+      const name = document.getElementById('newFolderNameInput').value.trim();
+      if (!name) return alert('Please enter a folder name');
+      albumsList.push({ id: 'folder_' + Date.now(), name, icon: 'folder', color: 'text-blue-400' });
+      closeNewFolderModal();
+      renderAlbumsGrid();
+    }
+
+    function switchTab(tabId) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      document.getElementById('galleryTab').classList.add('hidden');
+      document.getElementById('searchTab').classList.add('hidden');
+      document.getElementById('plansTab').classList.add('hidden');
+
+      document.getElementById('navHome').className = 'flex flex-col items-center space-y-1 text-neutral-400 cursor-pointer';
+      document.getElementById('navSearch').className = 'flex flex-col items-center space-y-1 text-neutral-400 cursor-pointer';
+      document.getElementById('navPlans').className = 'flex flex-col items-center space-y-1 text-neutral-400 cursor-pointer';
+
+      if (tabId === 'gallery') {
+        document.getElementById('galleryTab').classList.remove('hidden');
+        document.getElementById('navHome').className = 'flex flex-col items-center space-y-1 text-blue-500 cursor-pointer';
+      } else if (tabId === 'search') {
+        document.getElementById('searchTab').classList.remove('hidden');
+        document.getElementById('navSearch').className = 'flex flex-col items-center space-y-1 text-blue-500 cursor-pointer';
+      } else if (tabId === 'plans') {
+        document.getElementById('plansTab').classList.remove('hidden');
+        document.getElementById('navPlans').className = 'flex flex-col items-center space-y-1 text-blue-500 cursor-pointer';
+      }
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function openActionSheet() { document.getElementById('actionSheetModal').classList.remove('hidden'); if (window.lucide) lucide.createIcons(); }
+    function closeActionSheet() { document.getElementById('actionSheetModal').classList.add('hidden'); }
+    function triggerFilePicker(id) { closeActionSheet(); document.getElementById(id).click(); }
+
+    let pendingPayload = null;
+
+    function populateFolderDropdown(detectedFolderId) {
+      const select = document.getElementById('destinationFolderSelect');
+      select.innerHTML = '';
+      albumsList.forEach(album => {
+        if (album.id !== 'all') {
+          const opt = document.createElement('option');
+          opt.value = album.id;
+          opt.text = album.name;
+          if (album.id === detectedFolderId) opt.selected = true;
+          select.appendChild(opt);
+        }
+      });
+    }
+
+    function promptStorageChoice(e, inputCategory) {
+      if (e.target.files && e.target.files[0]) {
+        const file = e.target.files[0];
+        const url = URL.createObjectURL(file);
+        let mediaType = 'image';
+        let detectedFolder = 'downloads';
+        const lowerName = file.name.toLowerCase();
+
+        if (lowerName.includes('whatsapp')) detectedFolder = 'whatsapp';
+        else if (lowerName.includes('bluetooth')) detectedFolder = 'bluetooth';
+
+        if (file.type.startsWith('video/')) {
+          mediaType = 'video';
+          if (detectedFolder === 'downloads') detectedFolder = 'videos';
+        } else if (inputCategory === 'file' || (!file.type.startsWith('image/') && !file.type.startsWith('video/'))) {
+          mediaType = 'file';
+          if (detectedFolder === 'downloads') detectedFolder = 'files';
+        }
+
+        pendingPayload = {
+          id: 'item_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+          url: url,
+          mediaType: mediaType,
+          fileName: file.name,
+          size: file.size,
+          folderId: detectedFolder
+        };
+
+        populateFolderDropdown(detectedFolder);
+        document.getElementById('storagePromptSubtitle').innerText = `File: ${file.name}`;
+        document.getElementById('storageChoiceModal').classList.remove('hidden');
+        if (window.lucide) lucide.createIcons();
+      }
+    }
+
+    function openStorageChoiceForCamera() {
+      if (!capturedPhotoData) return;
+      pendingPayload = {
+        id: 'item_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+        url: capturedPhotoData,
+        mediaType: 'image',
+        fileName: `Photo_${Date.now()}.jpg`,
+        size: 2.8 * 1024 * 1024,
+        folderId: 'camera'
+      };
+      closeCameraModal();
+      populateFolderDropdown('camera');
+      document.getElementById('storagePromptSubtitle').innerText = "Camera Snapshot";
+      document.getElementById('storageChoiceModal').classList.remove('hidden');
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function confirmStoreLocation(choice) {
+      if (!pendingPayload) return;
+      pendingPayload.folderId = document.getElementById('destinationFolderSelect').value;
+      pendingPayload.location = choice;
+      pendingPayload.badgeText = (choice === 'cloud') ? 'More Space Cloud' : 'Mobile Storage';
+
+      if (choice === 'cloud') {
+        usedBytes += pendingPayload.size;
+        updateStorageDisplay();
+      }
+
+      mediaItems.unshift(pendingPayload);
+      renderGallery();
+      renderAlbumsGrid();
+      closeStorageChoiceModal();
+    }
+
+    function closeStorageChoiceModal() { pendingPayload = null; document.getElementById('storageChoiceModal').classList.add('hidden'); }
+
+    function renderGallery() {
+      const grid = document.getElementById('mediaGrid');
+      grid.innerHTML = '';
+      if (mediaItems.length === 0) {
+        document.getElementById('emptyState').classList.remove('hidden');
+        return;
+      }
+      document.getElementById('emptyState').classList.add('hidden');
+
+      mediaItems.forEach((item) => {
+        const card = document.createElement('div');
+        card.className = 'relative aspect-square bg-neutral-900 rounded-xl overflow-hidden cursor-pointer active:scale-95 transition-transform border border-neutral-800 flex items-center justify-center';
+        card.onclick = () => {
+          if (item.mediaType === 'file') openDocumentReader(item);
+          else openItemDetail(item);
+        };
+
+        if (item.mediaType === 'file') {
+          card.innerHTML = `
+            <div class="w-full h-full flex flex-col items-center justify-center p-2 bg-neutral-900 text-center">
+              <i data-lucide="file-text" class="w-7 h-7 text-blue-400 mb-1"></i>
+              <span class="text-[10px] text-neutral-300 truncate w-full px-1">${item.fileName}</span>
+              <span class="text-[8px] mt-1 bg-neutral-800 text-blue-400 px-1.5 py-0.5 rounded">PDF / Doc</span>
+            </div>
+          `;
+        } else if (item.mediaType === 'video') {
+          card.innerHTML = `
+            <video src="${item.url}" class="w-full h-full object-cover pointer-events-none" preload="metadata"></video>
+            <div class="absolute inset-0 flex items-center justify-center bg-black/20"><i data-lucide="play-circle" class="w-6 h-6 text-white drop-shadow-md"></i></div>
+            <span class="absolute top-1 left-1 text-[8px] bg-purple-950/90 text-purple-300 px-1.5 py-0.5 rounded border border-purple-800/80">${item.badgeText}</span>
+          `;
+        } else {
+          card.innerHTML = `
+            <img src="${item.url}" class="w-full h-full object-cover" />
+            <span class="absolute bottom-1 right-1 text-[8px] bg-black/70 backdrop-blur-xs text-white px-1.5 py-0.5 rounded">${item.badgeText}</span>
+          `;
+        }
+        grid.appendChild(card);
+      });
+      if (window.lucide) lucide.createIcons();
+    }
+
+    // Inbuilt PDF / Document Reader
+    function openDocumentReader(item) {
+      currentReadingDoc = item;
+      document.getElementById('readerDocTitle').innerText = item.fileName;
+      const container = document.getElementById('readerContainer');
+      container.innerHTML = `<iframe src="${item.url}" class="w-full h-full rounded-xl border border-neutral-800 bg-white"></iframe>`;
+      document.getElementById('documentReaderModal').classList.remove('hidden');
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function closeDocumentReaderModal() {
+      currentReadingDoc = null;
+      document.getElementById('documentReaderModal').classList.add('hidden');
+      document.getElementById('readerContainer').innerHTML = '';
+    }
+
+    function deleteCurrentDoc() {
+      if (!currentReadingDoc) return;
+      mediaItems = mediaItems.filter(i => i.id !== currentReadingDoc.id);
+      recycleBinItems.unshift(currentReadingDoc);
+      closeDocumentReaderModal();
+      renderGallery();
+      renderAlbumsGrid();
+    }
+
+    // Photo & Video Details
+    function openItemDetail(item) {
+      currentDetailItem = item;
+      const container = document.getElementById('detailMediaContainer');
+      document.getElementById('detailFileName').innerText = item.fileName;
+      document.getElementById('detailBadge').innerText = item.badgeText;
+
+      if (item.mediaType === 'video') {
+        container.innerHTML = `<video src="${item.url}" controls autoplay class="max-h-[70vh] w-auto rounded-2xl"></video>`;
+      } else {
+        container.innerHTML = `<img src="${item.url}" class="max-h-[70vh] w-auto object-contain rounded-2xl" />`;
+      }
+      document.getElementById('itemDetailModal').classList.remove('hidden');
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function closeItemDetailModal() {
+      currentDetailItem = null;
+      document.getElementById('itemDetailModal').classList.add('hidden');
+    }
+
+    function moveCurrentItemToRecycleBin() {
+      if (!currentDetailItem) return;
+      mediaItems = mediaItems.filter(i => i.id !== currentDetailItem.id);
+      recycleBinItems.unshift(currentDetailItem);
+      closeItemDetailModal();
+      renderGallery();
+      renderAlbumsGrid();
+    }
+
+    // Smart Duplicate Cleaner
+    function runSmartCleanerScan() {
+      document.getElementById('smartCleanerModal').classList.remove('hidden');
+      document.getElementById('cleanerScanResult').innerText = "Scanning all files for identical duplicates...";
+      document.getElementById('cleanDuplicatesBtn').classList.add('hidden');
+      document.getElementById('duplicateListContainer').classList.add('hidden');
+
+      setTimeout(() => {
+        const nameMap = {};
+        duplicateItemsFound = [];
+
+        mediaItems.forEach(item => {
+          if (nameMap[item.fileName]) duplicateItemsFound.push(item);
+          else nameMap[item.fileName] = true;
+        });
+
+        if (duplicateItemsFound.length > 0) {
+          document.getElementById('cleanerScanResult').innerText = `Found ${duplicateItemsFound.length} duplicate file(s)! Delete them to free up space?`;
+          document.getElementById('cleanDuplicatesBtn').classList.remove('hidden');
+          const list = document.getElementById('duplicateListContainer');
+          list.innerHTML = '';
+          duplicateItemsFound.forEach(d => {
+            list.innerHTML += `<div class="p-2 rounded-xl bg-neutral-800 text-xs truncate flex items-center justify-between"><span>${d.fileName}</span><span class="text-red-400 font-bold">Duplicate</span></div>`;
+          });
+          list.classList.remove('hidden');
+        } else {
+          document.getElementById('cleanerScanResult').innerText = "Your space is clean! No duplicate files or junk found.";
+        }
+      }, 700);
+
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function cleanDuplicates() {
+      duplicateItemsFound.forEach(dup => {
+        mediaItems = mediaItems.filter(i => i.id !== dup.id);
+        recycleBinItems.unshift(dup);
+      });
+      alert(`Cleaned ${duplicateItemsFound.length} duplicate files! Moved to Recycle Bin.`);
+      closeSmartCleanerModal();
+      renderGallery();
+      renderAlbumsGrid();
+    }
+
+    function closeSmartCleanerModal() { document.getElementById('smartCleanerModal').classList.add('hidden'); }
+
+    // Recycle Bin
+    function openRecycleBinModal() { renderRecycleBin(); document.getElementById('recycleBinModal').classList.remove('hidden'); if (window.lucide) lucide.createIcons(); }
+    function closeRecycleBinModal() { document.getElementById('recycleBinModal').classList.add('hidden'); }
+
+    function renderRecycleBin() {
+      const grid = document.getElementById('recycleBinGrid');
+      grid.innerHTML = '';
+      if (recycleBinItems.length === 0) {
+        document.getElementById('recycleBinEmptyState').classList.remove('hidden');
+        return;
+      }
+      document.getElementById('recycleBinEmptyState').classList.add('hidden');
+
+      recycleBinItems.forEach((item) => {
+        const card = document.createElement('div');
+        card.className = 'p-3 rounded-2xl bg-neutral-900 border border-neutral-800 flex flex-col space-y-2';
+        let previewMarkup = (item.mediaType === 'file') ? `<div class="h-24 rounded-xl bg-neutral-800 flex items-center justify-center"><i data-lucide="file-text" class="w-8 h-8 text-blue-400"></i></div>` : (item.mediaType === 'video' ? `<video src="${item.url}" class="h-24 w-full object-cover rounded-xl"></video>` : `<img src="${item.url}" class="h-24 w-full object-cover rounded-xl" />`);
+
+        card.innerHTML = `
+          ${previewMarkup}
+          <div class="px-1"><p class="text-[11px] font-semibold text-neutral-300 truncate">${item.fileName}</p></div>
+          <div class="flex items-center space-x-2 pt-1 border-t border-neutral-800">
+            <button onclick="restoreFromRecycleBin('${item.id}')" class="flex-1 py-1.5 bg-blue-600/20 text-blue-400 text-[10px] font-bold rounded-xl active:scale-95">Restore</button>
+            <button onclick="permanentDeleteItem('${item.id}')" class="flex-1 py-1.5 bg-red-950/40 text-red-400 text-[10px] font-bold rounded-xl active:scale-95 border border-red-900/40">Delete</button>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function restoreFromRecycleBin(itemId) {
+      const target = recycleBinItems.find(i => i.id === itemId);
+      if (!target) return;
+      recycleBinItems = recycleBinItems.filter(i => i.id !== itemId);
+      mediaItems.unshift(target);
+      renderRecycleBin(); renderGallery(); renderAlbumsGrid();
+    }
+
+    function permanentDeleteItem(itemId) {
+      const target = recycleBinItems.find(i => i.id === itemId);
+      if (!target) return;
+      if (target.location === 'cloud') { usedBytes = Math.max(0, usedBytes - target.size); updateStorageDisplay(); }
+      recycleBinItems = recycleBinItems.filter(i => i.id !== itemId);
+      renderRecycleBin(); renderAlbumsGrid();
+    }
+
+    function emptyRecycleBin() {
+      if (recycleBinItems.length === 0) return;
+      recycleBinItems.forEach(i => { if (i.location === 'cloud') usedBytes = Math.max(0, usedBytes - i.size); });
+      recycleBinItems = [];
+      updateStorageDisplay(); renderRecycleBin(); renderAlbumsGrid();
+    }
+
+    // Camera Logic
+    let cameraStream = null;
+    let cameraFacing = 'environment';
+    let capturedPhotoData = null;
+
+    async function openCameraModal() {
+      closeActionSheet();
+      document.getElementById('cameraModal').classList.remove('hidden');
+      document.getElementById('snapControls').classList.remove('hidden');
+      document.getElementById('previewControls').classList.add('hidden');
+      document.getElementById('cameraPreview').classList.add('hidden');
+      document.getElementById('cameraVideo').classList.remove('hidden');
+      await startCamera();
+      if (window.lucide) lucide.createIcons();
+    }
+
+    async function startCamera() {
+      try {
+        if (cameraStream) cameraStream.getTracks().forEach(t => t.stop());
+        cameraStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: cameraFacing }, width: { ideal: 1920 }, height: { ideal: 1080 } },
+          audio: false
+        });
+        document.getElementById('cameraVideo').srcObject = cameraStream;
+      } catch (err) { alert('Camera access denied.'); closeCameraModal(); }
+    }
+
+    function switchCameraFacing() {
+      cameraFacing = (cameraFacing === 'environment') ? 'user' : 'environment';
+      startCamera();
+    }
+
+    function snapPhoto() {
+      const video = document.getElementById('cameraVideo');
+      const canvas = document.getElementById('cameraCanvas');
+      canvas.width = video.videoWidth || 1280;
+      canvas.height = video.videoHeight || 720;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      capturedPhotoData = canvas.toDataURL('image/jpeg', 0.9);
+      document.getElementById('cameraPreview').src = capturedPhotoData;
+      document.getElementById('cameraPreview').classList.remove('hidden');
+      document.getElementById('cameraVideo').classList.add('hidden');
+      document.getElementById('snapControls').classList.add('hidden');
+      document.getElementById('previewControls').classList.remove('hidden');
+      if (cameraStream) cameraStream.getTracks().forEach(t => t.stop());
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function retakePhoto() {
+      capturedPhotoData = null;
+      document.getElementById('cameraPreview').classList.add('hidden');
+      document.getElementById('cameraVideo').classList.remove('hidden');
+      document.getElementById('snapControls').classList.remove('hidden');
+      document.getElementById('previewControls').classList.add('hidden');
+      startCamera();
+    }
+
+    function closeCameraModal() {
+      if (cameraStream) cameraStream.getTracks().forEach(t => t.stop());
+      document.getElementById('cameraModal').classList.add('hidden');
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      renderAlbumsGrid();
+      renderGallery();
+      if (window.lucide) lucide.createIcons();
+    });
+    renderAlbumsGrid();
+    renderGallery();
+  </script>
+</body>
+</html>
