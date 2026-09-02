@@ -541,11 +541,11 @@
     </div>
   </div>
 
-  <!-- 13. RECYCLE BIN DEDICATED MODAL -->
+  <!-- 13. RECYCLE BIN DEDICATED MODAL (FIXED VIDEO PREVIEWS) -->
   <div id="recycleBinModal" class="hidden fixed inset-0 z-50 bg-neutral-950 flex flex-col justify-between">
     <div class="p-4 border-b border-neutral-800 flex items-center justify-between bg-neutral-900/50">
       <div class="flex items-center space-x-3">
-        <button onclick="closeRecycleBinModal()" class="p-2 rounded-xl bg-neutral-800 text-neutral-300 active:scale-95"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>
+        <button onclick="closeRecycleBinModal()" class="p-2 rounded-xl bg-neutral-800 text-neutral-300 active:scale-95 cursor-pointer"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>
         <div>
           <h3 class="font-bold text-sm text-white">Recycle Bin</h3>
           <p class="text-[10px] text-neutral-400">Items preserve original storage location</p>
@@ -554,8 +554,9 @@
       <button onclick="emptyRecycleBin()" class="text-xs font-semibold text-red-400 hover:text-red-300 bg-red-950/40 px-3 py-1.5 rounded-xl border border-red-900/50 active:scale-95">Empty Bin</button>
     </div>
 
-    <div class="flex-1 overflow-y-auto p-3">
-      <div id="recycleBinGrid" class="grid grid-cols-2 gap-2.5"></div>
+    <div class="flex-1 overflow-y-auto p-3.5">
+      <!-- Responsive 1-col on mobile, 2-col on desktop -->
+      <div id="recycleBinGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-3.5"></div>
       <div id="recycleBinEmptyState" class="flex flex-col items-center justify-center text-center py-24 space-y-2">
         <i data-lucide="trash-2" class="w-10 h-10 text-neutral-700 mb-1"></i>
         <h4 class="text-xs font-bold text-neutral-400">Recycle Bin is Empty</h4>
@@ -666,7 +667,7 @@
     }
 
     // ================= APP STATE & STORAGE ARCHITECTURE =================
-    let defaultStorageSetting = localStorage.getItem('morespace_default_dest') || 'cloud'; // 'cloud' | 'local'
+    let defaultStorageSetting = localStorage.getItem('morespace_default_dest') || 'cloud';
     let currentPlanGB = parseInt(localStorage.getItem('morespace_plan_gb') || '2', 10);
     let currentPlanName = localStorage.getItem('morespace_plan_name') || 'Starter Pass (2 GB)';
 
@@ -676,7 +677,7 @@
     let currentDetailItem = null;
     let currentReadingDoc = null;
     let duplicateItemsFound = [];
-    let stagedUploadPayload = null; // Staged file for upload flow
+    let stagedUploadPayload = null;
 
     let albumsList = [
       { id: 'all', name: 'All Media', icon: 'images', color: 'text-blue-400' },
@@ -688,7 +689,6 @@
       { id: 'bluetooth', name: 'Bluetooth', icon: 'bluetooth', color: 'text-indigo-400' },
     ];
 
-    // Load custom folders from localStorage
     const savedCustomFolders = localStorage.getItem('morespace_custom_folders');
     if (savedCustomFolders) {
       try {
@@ -699,7 +699,6 @@
 
     // ================= STORAGE ESTIMATE & QUOTA MANAGEMENT =================
     async function updateStorageDisplay() {
-      // 1. Calculate Cloud Usage
       cloudUsedBytes = mediaItems
         .filter(item => item.location === 'cloud')
         .reduce((sum, item) => sum + (item.size || 0), 0);
@@ -718,7 +717,6 @@
       const planSubtitle = document.getElementById('plansQuotaSubtitle');
       if (planSubtitle) planSubtitle.innerText = `Active Plan: ${currentPlanName} (${currentPlanGB} GB Quota)`;
 
-      // 2. Estimate Device/Browser Storage via StorageManager API
       const deviceStorageEl = document.getElementById('deviceStorageEstimateText');
       if (deviceStorageEl) {
         if (navigator.storage && navigator.storage.estimate) {
@@ -836,7 +834,6 @@
       const newFolder = { id: 'folder_' + Date.now(), name, icon: 'folder', color: 'text-blue-400' };
       albumsList.push(newFolder);
 
-      // Save custom folders
       const customOnes = albumsList.filter(a => a.id.startsWith('folder_'));
       localStorage.setItem('morespace_custom_folders', JSON.stringify(customOnes));
 
@@ -844,7 +841,7 @@
       renderAlbumsGrid();
     }
 
-    // ================= SMART UPLOAD FLOW (PREPARATION & CONFIRMATION) =================
+    // ================= SMART UPLOAD FLOW =================
     function populateFolderSelect(selectedId) {
       const select = document.getElementById('confirmFolderSelect');
       select.innerHTML = '';
@@ -879,13 +876,13 @@
 
         stagedUploadPayload = {
           id: 'item_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
-          fileBlob: file, // Store actual blob persistently
+          fileBlob: file,
           mimeType: file.type || 'application/octet-stream',
           fileName: file.name,
           size: file.size,
           mediaType: mediaType,
           folderId: detectedFolder,
-          targetLocation: defaultStorageSetting, // Defaults to Settings destination
+          targetLocation: defaultStorageSetting,
           createdDate: new Date().toISOString()
         };
 
@@ -918,7 +915,6 @@
       populateFolderSelect(stagedUploadPayload.folderId);
       updateConfirmModalLocationDisplay();
 
-      // Reset override selector state
       document.getElementById('overrideDestinationBox').classList.add('hidden');
       const radios = document.getElementsByName('overrideLocationRadio');
       radios.forEach(r => r.checked = (r.value === stagedUploadPayload.targetLocation));
@@ -972,20 +968,18 @@
       if (window.lucide) lucide.createIcons();
     }
 
-    // ================= EXECUTE FINAL UPLOAD & STORAGE FULL VALIDATION =================
+    // ================= EXECUTE FINAL UPLOAD =================
     async function executeFinalUpload() {
       if (!stagedUploadPayload) return;
 
       const chosenFolder = document.getElementById('confirmFolderSelect').value;
       stagedUploadPayload.folderId = chosenFolder;
 
-      // Check Offline Status for Cloud Uploads
       if (stagedUploadPayload.targetLocation === 'cloud' && !navigator.onLine) {
         alert("You are offline. Cannot upload to More Space Cloud without internet. Switch to Mobile Storage or connect to Wi-Fi/data.");
         return;
       }
 
-      // Check Cloud Quota Limit
       if (stagedUploadPayload.targetLocation === 'cloud') {
         const totalCloudBytes = currentPlanGB * 1024 * 1024 * 1024;
         const projectedUsage = cloudUsedBytes + stagedUploadPayload.size;
@@ -997,7 +991,6 @@
         }
       }
 
-      // Save item persistently to IndexedDB
       const persistentItem = {
         id: stagedUploadPayload.id,
         fileName: stagedUploadPayload.fileName,
@@ -1005,9 +998,9 @@
         size: stagedUploadPayload.size,
         mediaType: stagedUploadPayload.mediaType,
         folderId: stagedUploadPayload.folderId,
-        location: stagedUploadPayload.targetLocation, // 'cloud' or 'local'
+        location: stagedUploadPayload.targetLocation,
         createdDate: stagedUploadPayload.createdDate,
-        fileBlob: stagedUploadPayload.fileBlob // Persisted in IndexedDB
+        fileBlob: stagedUploadPayload.fileBlob
       };
 
       try {
@@ -1040,7 +1033,7 @@
       openUploadConfirmModal();
     }
 
-    // ================= GALLERY RENDERING & PERSISTENT PREVIEWS =================
+    // ================= GALLERY RENDERING =================
     function renderGallery() {
       const grid = document.getElementById('mediaGrid');
       grid.innerHTML = '';
@@ -1055,7 +1048,6 @@
         const card = document.createElement('div');
         card.className = 'relative aspect-square bg-neutral-900 rounded-xl overflow-hidden cursor-pointer active:scale-95 transition-transform border border-neutral-800 flex items-center justify-center';
         
-        // Generate temporary object URL from the persistent Blob for display
         const displayUrl = item.fileBlob ? URL.createObjectURL(item.fileBlob) : '';
         const isCloud = (item.location === 'cloud');
         const badgeLabel = isCloud ? '☁ Cloud' : '📱 Mobile';
@@ -1123,7 +1115,7 @@
       document.getElementById('detailBadge').innerText = (item.location === 'cloud') ? '☁ More Space Cloud' : '📱 Mobile Storage';
 
       if (item.mediaType === 'video') {
-        container.innerHTML = `<video src="${objectUrl}" controls autoplay class="max-h-[70vh] w-auto rounded-2xl"></video>`;
+        container.innerHTML = `<video src="${objectUrl}" controls autoplay class="max-h-[70vh] w-auto rounded-2xl bg-black object-contain"></video>`;
       } else {
         container.innerHTML = `<img src="${objectUrl}" class="max-h-[70vh] w-auto object-contain rounded-2xl" />`;
       }
@@ -1143,7 +1135,6 @@
     }
 
     async function moveItemToRecycleBinInternal(target) {
-      // Remove from media_items store, add to recycle_bin store
       await dbDelete('media_items', target.id);
       await dbPut('recycle_bin', target);
 
@@ -1156,7 +1147,7 @@
       renderRecycleBin();
     }
 
-    // ================= RECYCLE BIN (INDEFINITE PERSISTENCE) =================
+    // ================= RECYCLE BIN (CORRECT FULL VIDEO PREVIEW & NO CROPPING) =================
     function openRecycleBinModal() { 
       renderRecycleBin(); 
       document.getElementById('recycleBinModal').classList.remove('hidden'); 
@@ -1178,23 +1169,49 @@
 
       recycleBinItems.forEach((item) => {
         const card = document.createElement('div');
-        card.className = 'p-3 rounded-2xl bg-neutral-900 border border-neutral-800 flex flex-col space-y-2';
+        card.className = 'p-3.5 rounded-2xl bg-neutral-900 border border-neutral-800 flex flex-col space-y-2.5';
         const displayUrl = item.fileBlob ? URL.createObjectURL(item.fileBlob) : '';
         const locBadge = (item.location === 'cloud') ? '☁ Cloud' : '📱 Mobile';
+        const badgeColor = (item.location === 'cloud') ? 'bg-blue-950/80 text-blue-300 border-blue-800/80' : 'bg-emerald-950/80 text-emerald-300 border-emerald-800/80';
 
-        let previewMarkup = (item.mediaType === 'file') ? 
-          `<div class="h-24 rounded-xl bg-neutral-800 flex items-center justify-center"><i data-lucide="file-text" class="w-8 h-8 text-blue-400"></i></div>` : 
-          (item.mediaType === 'video' ? `<video src="${displayUrl}" class="h-24 w-full object-cover rounded-xl"></video>` : `<img src="${displayUrl}" class="h-24 w-full object-cover rounded-xl" />`);
+        let previewMarkup = '';
+        if (item.mediaType === 'file') {
+          previewMarkup = `
+            <div class="w-full h-36 rounded-xl bg-neutral-800 flex flex-col items-center justify-center space-y-2 cursor-pointer" onclick="openDocumentReader(recycleBinItems.find(i => i.id === '${item.id}'), '${displayUrl}')">
+              <i data-lucide="file-text" class="w-10 h-10 text-blue-400"></i>
+              <span class="text-[10px] text-neutral-400">Click to view document</span>
+            </div>
+          `;
+        } else if (item.mediaType === 'video') {
+          // Responsive non-cropped full video frame preview with object-contain & dark background
+          previewMarkup = `
+            <div class="w-full rounded-xl overflow-hidden bg-black flex items-center justify-center border border-neutral-800/80" style="min-height: 180px; max-height: 420px;">
+              <video src="${displayUrl}" class="w-full h-auto max-h-[420px] object-contain bg-black rounded-xl" controls preload="metadata" playsinline></video>
+            </div>
+          `;
+        } else {
+          previewMarkup = `
+            <div class="w-full rounded-xl overflow-hidden bg-black flex items-center justify-center border border-neutral-800/80 cursor-pointer" style="min-height: 180px; max-height: 420px;" onclick="openItemDetail(recycleBinItems.find(i => i.id === '${item.id}'), '${displayUrl}')">
+              <img src="${displayUrl}" class="w-full h-auto max-h-[420px] object-contain bg-black rounded-xl" />
+            </div>
+          `;
+        }
 
         card.innerHTML = `
           ${previewMarkup}
-          <div class="px-1">
-            <p class="text-[11px] font-semibold text-neutral-300 truncate">${item.fileName}</p>
-            <span class="text-[9px] text-neutral-500">${locBadge}</span>
+          <div class="flex items-center justify-between px-1">
+            <p class="text-xs font-semibold text-neutral-200 truncate mr-2">${item.fileName}</p>
+            <span class="text-[9px] px-2 py-0.5 rounded border shrink-0 ${badgeColor}">${locBadge}</span>
           </div>
           <div class="flex items-center space-x-2 pt-1 border-t border-neutral-800">
-            <button onclick="restoreFromRecycleBin('${item.id}')" class="flex-1 py-1.5 bg-blue-600/20 text-blue-400 text-[10px] font-bold rounded-xl active:scale-95">Restore</button>
-            <button onclick="permanentDeleteItem('${item.id}')" class="flex-1 py-1.5 bg-red-950/40 text-red-400 text-[10px] font-bold rounded-xl active:scale-95 border border-red-900/40">Delete</button>
+            <button onclick="restoreFromRecycleBin('${item.id}')" class="flex-1 py-2 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 text-xs font-bold rounded-xl active:scale-95 transition-all flex items-center justify-center space-x-1 cursor-pointer border border-blue-500/20">
+              <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+              <span>Restore</span>
+            </button>
+            <button onclick="permanentDeleteItem('${item.id}')" class="flex-1 py-2 bg-red-950/40 hover:bg-red-900/40 text-red-400 text-xs font-bold rounded-xl active:scale-95 transition-all flex items-center justify-center space-x-1 border border-red-900/40 cursor-pointer">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+              <span>Delete</span>
+            </button>
           </div>
         `;
         grid.appendChild(card);
