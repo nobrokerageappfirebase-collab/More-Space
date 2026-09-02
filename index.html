@@ -1082,3 +1082,320 @@
           `;
         } else {
           card.innerHTML = `
+            <img src="${displayUrl}" class="w-full h-full object-cover" />
+            <span class="absolute bottom-1 right-1 text-[8px] px-1.5 py-0.5 rounded border ${badgeColor}">${badgeLabel}</span>
+          `;
+        }
+        grid.appendChild(card);
+      });
+      if (window.lucide) lucide.createIcons();
+    }
+
+    // ================= INBUILT DOCUMENT & PDF VIEWER =================
+    function openDocumentReader(item, objectUrl) {
+      currentReadingDoc = item;
+      document.getElementById('readerDocTitle').innerText = item.fileName;
+      document.getElementById('readerDocBadge').innerText = (item.location === 'cloud') ? '☁ More Space Cloud Document' : '📱 Mobile Storage Document';
+      
+      const container = document.getElementById('readerContainer');
+      container.innerHTML = `<iframe src="${objectUrl}" class="w-full h-full rounded-xl border border-neutral-800 bg-white"></iframe>`;
+      document.getElementById('documentReaderModal').classList.remove('hidden');
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function closeDocumentReaderModal() {
+      currentReadingDoc = null;
+      document.getElementById('documentReaderModal').classList.add('hidden');
+      document.getElementById('readerContainer').innerHTML = '';
+    }
+
+    async function deleteCurrentDoc() {
+      if (!currentReadingDoc) return;
+      await moveItemToRecycleBinInternal(currentReadingDoc);
+      closeDocumentReaderModal();
+    }
+
+    // ================= PHOTO & VIDEO DETAILS / DELETION =================
+    function openItemDetail(item, objectUrl) {
+      currentDetailItem = item;
+      const container = document.getElementById('detailMediaContainer');
+      document.getElementById('detailFileName').innerText = item.fileName;
+      document.getElementById('detailBadge').innerText = (item.location === 'cloud') ? '☁ More Space Cloud' : '📱 Mobile Storage';
+
+      if (item.mediaType === 'video') {
+        container.innerHTML = `<video src="${objectUrl}" controls autoplay class="max-h-[70vh] w-auto rounded-2xl"></video>`;
+      } else {
+        container.innerHTML = `<img src="${objectUrl}" class="max-h-[70vh] w-auto object-contain rounded-2xl" />`;
+      }
+      document.getElementById('itemDetailModal').classList.remove('hidden');
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function closeItemDetailModal() {
+      currentDetailItem = null;
+      document.getElementById('itemDetailModal').classList.add('hidden');
+    }
+
+    async function moveCurrentItemToRecycleBin() {
+      if (!currentDetailItem) return;
+      await moveItemToRecycleBinInternal(currentDetailItem);
+      closeItemDetailModal();
+    }
+
+    async function moveItemToRecycleBinInternal(target) {
+      // Remove from media_items store, add to recycle_bin store
+      await dbDelete('media_items', target.id);
+      await dbPut('recycle_bin', target);
+
+      mediaItems = mediaItems.filter(i => i.id !== target.id);
+      recycleBinItems.unshift(target);
+
+      renderGallery();
+      renderAlbumsGrid();
+      updateStorageDisplay();
+      renderRecycleBin();
+    }
+
+    // ================= RECYCLE BIN (INDEFINITE PERSISTENCE) =================
+    function openRecycleBinModal() { 
+      renderRecycleBin(); 
+      document.getElementById('recycleBinModal').classList.remove('hidden'); 
+      if (window.lucide) lucide.createIcons(); 
+    }
+    
+    function closeRecycleBinModal() { 
+      document.getElementById('recycleBinModal').classList.add('hidden'); 
+    }
+
+    function renderRecycleBin() {
+      const grid = document.getElementById('recycleBinGrid');
+      grid.innerHTML = '';
+      if (recycleBinItems.length === 0) {
+        document.getElementById('recycleBinEmptyState').classList.remove('hidden');
+        return;
+      }
+      document.getElementById('recycleBinEmptyState').classList.add('hidden');
+
+      recycleBinItems.forEach((item) => {
+        const card = document.createElement('div');
+        card.className = 'p-3 rounded-2xl bg-neutral-900 border border-neutral-800 flex flex-col space-y-2';
+        const displayUrl = item.fileBlob ? URL.createObjectURL(item.fileBlob) : '';
+        const locBadge = (item.location === 'cloud') ? '☁ Cloud' : '📱 Mobile';
+
+        let previewMarkup = (item.mediaType === 'file') ? 
+          `<div class="h-24 rounded-xl bg-neutral-800 flex items-center justify-center"><i data-lucide="file-text" class="w-8 h-8 text-blue-400"></i></div>` : 
+          (item.mediaType === 'video' ? `<video src="${displayUrl}" class="h-24 w-full object-cover rounded-xl"></video>` : `<img src="${displayUrl}" class="h-24 w-full object-cover rounded-xl" />`);
+
+        card.innerHTML = `
+          ${previewMarkup}
+          <div class="px-1">
+            <p class="text-[11px] font-semibold text-neutral-300 truncate">${item.fileName}</p>
+            <span class="text-[9px] text-neutral-500">${locBadge}</span>
+          </div>
+          <div class="flex items-center space-x-2 pt-1 border-t border-neutral-800">
+            <button onclick="restoreFromRecycleBin('${item.id}')" class="flex-1 py-1.5 bg-blue-600/20 text-blue-400 text-[10px] font-bold rounded-xl active:scale-95">Restore</button>
+            <button onclick="permanentDeleteItem('${item.id}')" class="flex-1 py-1.5 bg-red-950/40 text-red-400 text-[10px] font-bold rounded-xl active:scale-95 border border-red-900/40">Delete</button>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+      if (window.lucide) lucide.createIcons();
+    }
+
+    async function restoreFromRecycleBin(itemId) {
+      const target = recycleBinItems.find(i => i.id === itemId);
+      if (!target) return;
+
+      await dbDelete('recycle_bin', target.id);
+      await dbPut('media_items', target);
+
+      recycleBinItems = recycleBinItems.filter(i => i.id !== itemId);
+      mediaItems.unshift(target);
+
+      renderRecycleBin(); 
+      renderGallery(); 
+      renderAlbumsGrid();
+      updateStorageDisplay();
+    }
+
+    async function permanentDeleteItem(itemId) {
+      const target = recycleBinItems.find(i => i.id === itemId);
+      if (!target) return;
+
+      await dbDelete('recycle_bin', target.id);
+      recycleBinItems = recycleBinItems.filter(i => i.id !== itemId);
+
+      renderRecycleBin(); 
+      renderAlbumsGrid();
+      updateStorageDisplay();
+    }
+
+    async function emptyRecycleBin() {
+      if (recycleBinItems.length === 0) return;
+      await dbClear('recycle_bin');
+      recycleBinItems = [];
+      updateStorageDisplay(); 
+      renderRecycleBin(); 
+      renderAlbumsGrid();
+    }
+
+    // ================= SMART DUPLICATE CLEANER =================
+    function runSmartCleanerScan() {
+      document.getElementById('smartCleanerModal').classList.remove('hidden');
+      document.getElementById('cleanerScanResult').innerText = "Scanning persistent storage for duplicates...";
+      document.getElementById('cleanDuplicatesBtn').classList.add('hidden');
+      document.getElementById('duplicateListContainer').classList.add('hidden');
+
+      setTimeout(() => {
+        const sizeMap = {};
+        duplicateItemsFound = [];
+
+        mediaItems.forEach(item => {
+          const key = `${item.fileName}_${item.size}`;
+          if (sizeMap[key]) duplicateItemsFound.push(item);
+          else sizeMap[key] = true;
+        });
+
+        if (duplicateItemsFound.length > 0) {
+          document.getElementById('cleanerScanResult').innerText = `Found ${duplicateItemsFound.length} duplicate file(s)! Delete them to free up space?`;
+          document.getElementById('cleanDuplicatesBtn').classList.remove('hidden');
+          const list = document.getElementById('duplicateListContainer');
+          list.innerHTML = '';
+          duplicateItemsFound.forEach(d => {
+            const locText = (d.location === 'cloud') ? 'Cloud' : 'Mobile';
+            list.innerHTML += `<div class="p-2 rounded-xl bg-neutral-800 text-xs truncate flex items-center justify-between"><span>${d.fileName} (${locText})</span><span class="text-red-400 font-bold">Duplicate</span></div>`;
+          });
+          list.classList.remove('hidden');
+        } else {
+          document.getElementById('cleanerScanResult').innerText = "Your space is clean! No duplicate files or junk found.";
+        }
+      }, 700);
+
+      if (window.lucide) lucide.createIcons();
+    }
+
+    async function cleanDuplicates() {
+      for (const dup of duplicateItemsFound) {
+        await moveItemToRecycleBinInternal(dup);
+      }
+      alert(`Cleaned ${duplicateItemsFound.length} duplicate files! Moved to Recycle Bin.`);
+      closeSmartCleanerModal();
+    }
+
+    function closeSmartCleanerModal() { document.getElementById('smartCleanerModal').classList.add('hidden'); }
+
+    // ================= HTML5 CAMERA CAPTURE =================
+    let cameraStream = null;
+    let cameraFacing = 'environment';
+    let capturedPhotoBlob = null;
+
+    async function openCameraModal() {
+      closeActionSheet();
+      document.getElementById('cameraModal').classList.remove('hidden');
+      document.getElementById('snapControls').classList.remove('hidden');
+      document.getElementById('previewControls').classList.add('hidden');
+      document.getElementById('cameraPreview').classList.add('hidden');
+      document.getElementById('cameraVideo').classList.remove('hidden');
+      await startCamera();
+      if (window.lucide) lucide.createIcons();
+    }
+
+    async function startCamera() {
+      try {
+        if (cameraStream) cameraStream.getTracks().forEach(t => t.stop());
+        cameraStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: cameraFacing }, width: { ideal: 1920 }, height: { ideal: 1080 } },
+          audio: false
+        });
+        document.getElementById('cameraVideo').srcObject = cameraStream;
+      } catch (err) { alert('Camera access denied or unavailable.'); closeCameraModal(); }
+    }
+
+    function switchCameraFacing() {
+      cameraFacing = (cameraFacing === 'environment') ? 'user' : 'environment';
+      startCamera();
+    }
+
+    function snapPhoto() {
+      const video = document.getElementById('cameraVideo');
+      const canvas = document.getElementById('cameraCanvas');
+      canvas.width = video.videoWidth || 1280;
+      canvas.height = video.videoHeight || 720;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      canvas.toBlob((blob) => {
+        capturedPhotoBlob = blob;
+        const previewUrl = URL.createObjectURL(blob);
+        document.getElementById('cameraPreview').src = previewUrl;
+        document.getElementById('cameraPreview').classList.remove('hidden');
+        document.getElementById('cameraVideo').classList.add('hidden');
+        document.getElementById('snapControls').classList.add('hidden');
+        document.getElementById('previewControls').classList.remove('hidden');
+      }, 'image/jpeg', 0.9);
+
+      if (cameraStream) cameraStream.getTracks().forEach(t => t.stop());
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function retakePhoto() {
+      capturedPhotoBlob = null;
+      document.getElementById('cameraPreview').classList.add('hidden');
+      document.getElementById('cameraVideo').classList.remove('hidden');
+      document.getElementById('snapControls').classList.remove('hidden');
+      document.getElementById('previewControls').classList.add('hidden');
+      startCamera();
+    }
+
+    function closeCameraModal() {
+      if (cameraStream) cameraStream.getTracks().forEach(t => t.stop());
+      document.getElementById('cameraModal').classList.add('hidden');
+    }
+
+    // ================= GENERAL NAVIGATION =================
+    function switchTab(tabId) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      document.getElementById('galleryTab').classList.add('hidden');
+      document.getElementById('searchTab').classList.add('hidden');
+      document.getElementById('plansTab').classList.add('hidden');
+
+      document.getElementById('navHome').className = 'flex flex-col items-center space-y-1 text-neutral-400 cursor-pointer';
+      document.getElementById('navSearch').className = 'flex flex-col items-center space-y-1 text-neutral-400 cursor-pointer';
+      document.getElementById('navPlans').className = 'flex flex-col items-center space-y-1 text-neutral-400 cursor-pointer';
+
+      if (tabId === 'gallery') {
+        document.getElementById('galleryTab').classList.remove('hidden');
+        document.getElementById('navHome').className = 'flex flex-col items-center space-y-1 text-blue-500 cursor-pointer';
+      } else if (tabId === 'search') {
+        document.getElementById('searchTab').classList.remove('hidden');
+        document.getElementById('navSearch').className = 'flex flex-col items-center space-y-1 text-blue-500 cursor-pointer';
+      } else if (tabId === 'plans') {
+        document.getElementById('plansTab').classList.remove('hidden');
+        document.getElementById('navPlans').className = 'flex flex-col items-center space-y-1 text-blue-500 cursor-pointer';
+      }
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function openActionSheet() { document.getElementById('actionSheetModal').classList.remove('hidden'); if (window.lucide) lucide.createIcons(); }
+    function closeActionSheet() { document.getElementById('actionSheetModal').classList.add('hidden'); }
+    function triggerFilePicker(id) { closeActionSheet(); document.getElementById(id).click(); }
+
+    // ================= INITIAL LOAD & DB REHYDRATION =================
+    window.addEventListener('DOMContentLoaded', async () => {
+      try {
+        await initDB();
+        mediaItems = await dbGetAll('media_items');
+        recycleBinItems = await dbGetAll('recycle_bin');
+      } catch (e) {
+        console.error("DB load error:", e);
+      }
+
+      applyDefaultStorageUI();
+      renderAlbumsGrid();
+      renderGallery();
+      updateStorageDisplay();
+      if (window.lucide) lucide.createIcons();
+    });
+  </script>
+</body>
+</html>
